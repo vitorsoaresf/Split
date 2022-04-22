@@ -1,4 +1,3 @@
-from xmlrpc.client import Boolean
 from app.configs.database import db
 from sqlalchemy import Integer, String, Column, Date
 from sqlalchemy.orm import relationship
@@ -17,8 +16,8 @@ class Patient(db.Model):
     city = Column(String)
     profession= Column(String)
     marital_status = Column(String)
-    resposible_guardian= (String)
-    responsible_contatact = (String)
+    responsible_guardian= Column(String)
+    responsible_contact = Column(String)
     birth_date = Column(Date)
 
 
