@@ -2,6 +2,7 @@ from app.configs.database import db
 from sqlalchemy import Integer, String, Column, Date
 from sqlalchemy.orm import relationship
 from .patient_allergie_table import patients_allergies
+from marshmallow import Schema, fields, validate, validates
 
 
 class Patient(db.Model):
@@ -22,3 +23,23 @@ class Patient(db.Model):
 
 
     allergies = relationship("Allergy",secondary=patients_allergies ,back_populates="patients")
+
+
+
+class PatientSchema(Schema):
+
+    patient_id = fields.Integer()
+    name = fields.String()
+    gender = fields.String()
+    hospitalization_date = fields.Date()
+    patient_code = fields.String()
+    city = fields.String()
+    profession= fields.String()
+    marital_status = fields.String()
+    responsible_guardian= fields.String()
+    responsible_contact = fields.String()
+    birth_date = fields.Date()
+    allergies = fields.List(String)
+
+
+   
