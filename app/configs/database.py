@@ -9,3 +9,4 @@ def init_app(app: Flask):
     app.db = db
 
     # Aqui vão os imports das Models
+    from app.models.user_model import User

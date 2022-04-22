@@ -1,5 +1,5 @@
 from flask import Blueprint, Flask
-from .user_route import bp as bp_user
+from .user_blueprint import bp as bp_user
 from .patient_route import bp as bp_patient
 
 bp_api = Blueprint("api", __name__, url_prefix="/api")
