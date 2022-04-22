@@ -1,10 +1,19 @@
+from dataclasses import dataclass
 from app.configs.database import db
 from sqlalchemy import Column, Integer, String
 
 
+@dataclass
 class User(db.Model):
 
     __tablename__ = "users"
+    user_id: int
+    name: str
+    crm: str
+    cpf: str
+    city: str
+    phone: str
+    email: str
 
     user_id = Column(Integer, primary_key=True)
     name = Column(String(256), nullable=False)
