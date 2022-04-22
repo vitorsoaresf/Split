@@ -11,7 +11,7 @@ class Patient(db.Model):
     patient_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     gender = Column(String, nullable=False)
-    hospitalizatio_date = Column(Date)
+    hospitalization_date = Column(Date)
     patient_code = Column(String)
     city = Column(String)
     profession= Column(String)
