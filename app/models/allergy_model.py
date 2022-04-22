@@ -8,7 +8,7 @@ class Allergy(db.Model):
 
     __tablename__ = "allergies"
 
-    alergie_id = Column(Integer, primary_key=True)
+    allergy_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False, unique=True)
 
 
