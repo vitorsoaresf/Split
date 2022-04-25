@@ -10,8 +10,8 @@ class Comment(db.Model):
 
     __tablename__ = "comments"
 
-    id = Column(Integer, primary_key=True) # ou comment_id
+    comment_id = Column(Integer, primary_key=True) # ou comment_id
     comment = Column(Text, nullable=False) # não está no diagrama.
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    data_id = Column(Integer, ForeignKey("datas.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
+    data_id = Column(Integer, ForeignKey("datas.data_id"), nullable=False)
 
