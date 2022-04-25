@@ -11,6 +11,6 @@ class Patient(db.Model):
 
     tag_id = Column(Integer, primary_key=True)
     tag = Column(String, nullable=False)
-    data_id = Column(Integer, ForeignKey("datas.id"), nullable=False)
-    patient_id = Column(Integer, ForeignKey("patients.id")) #verificar nomes da coluna id na tabelas patients e datas
+    data_id = Column(Integer, ForeignKey("datas.data_id"), nullable=False)
+    patient_id = Column(Integer, ForeignKey("patients.patient_id"))
     alert_tag = Column(Boolean)
