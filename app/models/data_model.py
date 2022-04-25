@@ -15,6 +15,7 @@ class Data(db.Model):
         description: A string field to describe any conditions about the patient.
         date: A datetime field to indicate when the patient was created.
         
+        patient_id: A integer value indicating the patient id.
         category_id: A foreign key to the category table.
     """
     
@@ -25,6 +26,7 @@ class Data(db.Model):
     description = Column(String(256))
     date = Column(DateTime)
     
+    patient_id = Column(Integer, db.ForeignKey('patients.patient_id'))
     category_id = Column(Integer, db.ForeignKey('categories.category_id'))
     
     
@@ -40,6 +42,7 @@ class DataSchema(Schema):
         description: A string field to describe any conditions about the patient.
         date: A datetime field to indicate when the patient was created.
         
+        patient_id: A integer value indicating the patient id.
         category_id: A foreign key to the category table.
     
     """
@@ -49,4 +52,5 @@ class DataSchema(Schema):
     description = fields.String()
     date = fields.DateTime()
     
+    patient_id = fields.Integer()
     category_id = fields.Integer()
