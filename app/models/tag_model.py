@@ -9,7 +9,7 @@ class Patient(db.Model):
 
     __tablename__ = "tags"
 
-    id = Column(Integer, primary_key=True)
+    tag_id = Column(Integer, primary_key=True)
     tag = Column(String, nullable=False)
     data_id = Column(Integer, ForeignKey("datas.id"), nullable=False)
     patient_id = Column(Integer, ForeignKey("patients.id")) #verificar nomes da coluna id na tabelas patients e datas
