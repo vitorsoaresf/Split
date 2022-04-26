@@ -53,4 +53,3 @@ class UserSchema(Schema):
     phone = fields.String()
     email = fields.String()
     profession = fields.String()
-    # address = fields.Dict()

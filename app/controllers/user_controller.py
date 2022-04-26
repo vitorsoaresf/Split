@@ -42,6 +42,7 @@ def get_users():
         address = Address.query.get(user.address_id)
 
         result_user = {
+            "_id": user.user_id,
             "name": user.name,
             "profession": user.profession,
             "cpf": user.cpf,
@@ -66,6 +67,7 @@ def get_user_specific(id: int):
     address = Address.query.get(user.address_id)
 
     return {
+        "_id": user.user_id,
         "name": user.name,
         "profession": user.profession,
         "cpf": user.cpf,

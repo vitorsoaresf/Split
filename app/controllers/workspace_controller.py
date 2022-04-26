@@ -25,7 +25,7 @@ def create_workspace():
 def get_workspaces():
     workspaces = Workspace.query.all()
 
-    return WorkspaceSchema(many=True).dump(workspaces), HTTPStatus.OK
+    return jsonify(WorkspaceSchema(many=True).dump(workspaces)), HTTPStatus.OK
 
 
 def get_specific_workspace(id: int):
