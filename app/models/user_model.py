@@ -19,7 +19,7 @@ class User(db.Model):
 
     user_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    registro = Column(String(9), nullable=False, unique=True)
+    registro = Column(String, nullable=False, unique=True)
     cpf = Column(String(11), nullable=False, unique=True)
     city = Column(String, nullable=False)
     phone = Column(String(11), nullable=False)
