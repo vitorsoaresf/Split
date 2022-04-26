@@ -5,13 +5,15 @@ from marshmallow import Schema, fields
 
 class Address(db.Model):
 
+    __tablename__ = "address"
+
     address_id = Column(Integer, primary_key=True)
     street = Column(String, nullable=False)
     cep = Column(String(8), nullable=False)
     number_house = Column(String, nullable=False)
     complement = Column(String, nullable=False)
 
-    user = db.relationship("User", back_populates="user_id")
+    user = db.relationship("User", back_populates="address", uselist=False)
 
 
 class AddressSchema(Schema):

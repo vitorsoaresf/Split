@@ -1,7 +1,8 @@
 from http import HTTPStatus
 from flask import jsonify, request, current_app
-from app.models.user_model import User
+from app.models.user_model import User, UserSchema
 from sqlalchemy.orm import Session
+from app.models import Address, AddressSchema
 from app.configs.database import db
 
 
@@ -9,33 +10,70 @@ def create_user():
     session: Session = current_app.db.session
     data = request.json
 
+    address = data.pop("address")
+    schema = AddressSchema()
+    schema.load(address)
+
+    res_address = Address(**address)
+
+    schema = UserSchema()
+    schema.load(data)
+
     user = User(**data)
+
+    session.add(res_address)
+    session.commit()
+
+    user.address_id = res_address.address_id
 
     session.add(user)
     session.commit()
 
-    return jsonify(user), HTTPStatus.CREATED
+    return schema.dump(user), HTTPStatus.CREATED
 
 
-def get_user():
+def get_users():
+    schemaAddress = AddressSchema()
 
     users = User.query.all()
 
-    print(">>>>>>>. ", users)
+    list_users = []
+    for user in users:
+        address = Address.query.get(user.address_id)
 
-    # serializer_users = [user for user in users]
-    # print(serializer_users)
+        result_user = {
+            "name": user.name,
+            "profession": user.profession,
+            "cpf": user.cpf,
+            "phone": user.phone,
+            "email": user.email,
+            "profession_code": user.profession_code,
+            "address": schemaAddress.dump(address),
+        }
 
-    return jsonify(users)
+        list_users.append(result_user)
+
+    return jsonify(list_users), HTTPStatus.OK
 
 
 def get_user_specific(id: int):
     user = User.query.get(id)
+    schemaAddress = AddressSchema()
 
     if not user:
         return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
 
-    return jsonify(user)
+    address = Address.query.get(user.address_id)
+
+    return {
+        "name": user.name,
+        "profession": user.profession,
+        "cpf": user.cpf,
+        "phone": user.phone,
+        "email": user.email,
+        "profession_code": user.profession_code,
+        "address": schemaAddress.dump(address),
+    }, HTTPStatus.OK
 
 
 def update_user(id: int):

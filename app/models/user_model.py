@@ -1,36 +1,29 @@
 from dataclasses import dataclass
 from app.configs.database import db
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from marshmallow import Schema, fields
 
 
-@dataclass
 class User(db.Model):
-    user_id: int
-    name: str
-    registro: str
-    cpf: str
-    city: str
-    phone: str
-    email: str
-    funcao: str
-
     __tablename__ = "users"
 
     user_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
-    registro = Column(String, nullable=False, unique=True)
+    profession_code = Column(String, nullable=False, unique=True)
     cpf = Column(String(11), nullable=False, unique=True)
-    city = Column(String, nullable=False)
     phone = Column(String(11), nullable=False)
     email = Column(String, nullable=False, unique=True)
-    funcao = Column(String, nullable=False)
+    profession = Column(String, nullable=False)
+
+    address_id = Column(
+        Integer, ForeignKey("address.address_id"), nullable=False, unique=True
+    )
 
     workspaces = db.relationship(
         "Workspace", secondary="users_workspaces", back_populates="users", uselist=True
     )
 
-    address = db.relationship("Address", back_populates="address_id")
+    address = db.relationship("Address", back_populates="user")
     # medico, enfermeiro, farmaceutico e nutricionista pode ser tabela ou verificação mesmo
     # numero de registro
     # patch,post e delete data, comments,category,
@@ -55,9 +48,9 @@ class UserSchema(Schema):
 
     user_id = fields.Integer()
     name = fields.String()
-    registro = fields.String()
+    profession_code = fields.String()
     cpf = fields.String()
-    city = fields.String()
     phone = fields.String()
     email = fields.String()
-    funcao = fields.String()
+    profession = fields.String()
+    # address = fields.Dict()
