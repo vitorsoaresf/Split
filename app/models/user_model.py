@@ -29,6 +29,8 @@ class User(db.Model):
     workspaces = db.relationship(
         "Workspace", secondary="users_workspaces", back_populates="users", uselist=True
     )
+
+    address = db.relationship("Address", back_populates="address_id")
     # medico, enfermeiro, farmaceutico e nutricionista pode ser tabela ou verificação mesmo
     # numero de registro
     # patch,post e delete data, comments,category,
