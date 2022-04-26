@@ -1,9 +1,18 @@
+from dataclasses import dataclass
 from app.configs.database import db
 from sqlalchemy import Column, Integer, String
 from marshmallow import Schema, fields
 
 
+@dataclass
 class User(db.Model):
+    user_id: int
+    name: str
+    crm: str
+    cpf: str
+    city: str
+    phone: str
+    email: str
 
     __tablename__ = "users"
 
@@ -14,6 +23,10 @@ class User(db.Model):
     city = Column(String(30), nullable=False)
     phone = Column(String(11), nullable=False, unique=True)
     email = Column(String(50), nullable=False, unique=True)
+
+    workspaces = db.relationship(
+        "Workspace", secondary="users_workspaces", back_populates="users", uselist=True
+    )
 
 
 class UserSchema(Schema):
