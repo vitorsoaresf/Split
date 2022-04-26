@@ -1,5 +1,5 @@
 from app.configs.database import db
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
 from marshmallow import Schema, fields
 
 
@@ -17,6 +17,7 @@ class Workspace(db.Model):
     __tablename__ = "workspaces"
 
     workspace_id = Column(Integer, primary_key=True)
+    owner_id = Column(Integer, ForeignKey("users.user_id"))
     name = Column(String)
     local = Column(String)
 
@@ -38,5 +39,6 @@ class WorkspaceSchema(Schema):
     """
 
     workspace_id = fields.Integer()
+    owner_id = fields.Integer()
     name = fields.String()
     local = fields.String()
