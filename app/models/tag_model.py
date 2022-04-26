@@ -1,11 +1,8 @@
-from dataclasses import dataclass
 from app.configs.database import db
-from sqlalchemy import ForeignKey, Integer, String, Column, Date, Boolean
+from sqlalchemy import ForeignKey, Integer, String, Column, Boolean
+# from marshmallow import Schema, fields, validate, validates
 
-@dataclass
-class Patient(db.Model):
-
-    tag: str
+class Tag(db.Model):
 
     __tablename__ = "tags"
 
@@ -14,3 +11,12 @@ class Patient(db.Model):
     data_id = Column(Integer, ForeignKey("datas.data_id"), nullable=False)
     patient_id = Column(Integer, ForeignKey("patients.patient_id"))
     alert_tag = Column(Boolean)
+
+# class TagSchema(Schema):
+
+#     tag = fields.String()
+#     alert_tag = fields.Boolean()
+
+#     @validates("tag")
+#     def valida_n_char():
+        
