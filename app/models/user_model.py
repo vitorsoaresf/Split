@@ -8,25 +8,31 @@ from marshmallow import Schema, fields
 class User(db.Model):
     user_id: int
     name: str
-    crm: str
+    registro: str
     cpf: str
     city: str
     phone: str
     email: str
+    funcao: str
 
     __tablename__ = "users"
 
     user_id = Column(Integer, primary_key=True)
-    name = Column(String(200), nullable=False)
-    crm = Column(String(9), nullable=False, unique=True)
+    name = Column(String, nullable=False)
+    registro = Column(String(9), nullable=False, unique=True)
     cpf = Column(String(11), nullable=False, unique=True)
-    city = Column(String(30), nullable=False)
-    phone = Column(String(11), nullable=False, unique=True)
-    email = Column(String(50), nullable=False, unique=True)
+    city = Column(String, nullable=False)
+    phone = Column(String(11), nullable=False)
+    email = Column(String, nullable=False, unique=True)
+    funcao = Column(String, nullable=False)
 
     workspaces = db.relationship(
         "Workspace", secondary="users_workspaces", back_populates="users", uselist=True
     )
+    # medico, enfermeiro, farmaceutico e nutricionista pode ser tabela ou verificação mesmo
+    # numero de registro
+    # patch,post e delete data, comments,category,
+    # get somente patients, workspaces e users
 
 
 class UserSchema(Schema):
@@ -47,8 +53,9 @@ class UserSchema(Schema):
 
     user_id = fields.Integer()
     name = fields.String()
-    crm = fields.String()
+    registro = fields.String()
     cpf = fields.String()
     city = fields.String()
     phone = fields.String()
     email = fields.String()
+    funcao = fields.String()

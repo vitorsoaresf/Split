@@ -17,8 +17,8 @@ class Workspace(db.Model):
     __tablename__ = "workspaces"
 
     workspace_id = Column(Integer, primary_key=True)
-    name = Column(String(256))
-    local = Column(String(256))
+    name = Column(String)
+    local = Column(String)
 
     users = db.relationship(
         "User", secondary="users_workspaces", back_populates="workspaces", uselist=True
