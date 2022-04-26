@@ -20,6 +20,10 @@ class Workspace(db.Model):
     name = Column(String(256))
     local = Column(String(256))
 
+    users = db.relationship(
+        "Users", secondary="users_workspaces", back_populates="workspaces",uselist=True
+    )
+
 
 class WorkspaceSchema(Schema):
     """Workspace schema.

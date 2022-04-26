@@ -15,6 +15,10 @@ class User(db.Model):
     phone = Column(String(11), nullable=False, unique=True)
     email = Column(String(50), nullable=False, unique=True)
 
+    workspaces = db.relationship(
+        "Workspace", secondary="users_workspaces", back_populates="users", uselist=True
+    )
+
 
 class UserSchema(Schema):
     """User schema.
