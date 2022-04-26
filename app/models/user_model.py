@@ -16,18 +16,17 @@ class User(db.Model):
     profession = Column(String, nullable=False)
 
     address_id = Column(
-        Integer, ForeignKey("address.address_id"), nullable=False, unique=True
+        Integer,
+        ForeignKey("address.address_id", ondelete="CASCADE"),
+        nullable=False,
+        unique=True,
     )
 
     workspaces = db.relationship(
         "Workspace", secondary="users_workspaces", back_populates="users", uselist=True
     )
 
-    address = db.relationship("Address", back_populates="user")
-    # medico, enfermeiro, farmaceutico e nutricionista pode ser tabela ou verificação mesmo
-    # numero de registro
-    # patch,post e delete data, comments,category,
-    # get somente patients, workspaces e users
+    address = db.relationship("Address", cascade="all,delete", back_populates="user")
 
 
 class UserSchema(Schema):
