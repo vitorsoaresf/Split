@@ -1,5 +1,5 @@
 from app.configs.database import db
-from sqlalchemy import Integer, String, Column, Date
+from sqlalchemy import Integer, String, Column, Date, ForeignKey
 from sqlalchemy.orm import relationship
 from .patient_allergie_table import patients_allergies
 from marshmallow import Schema, fields, validate, validates
@@ -20,10 +20,12 @@ class Patient(db.Model):
     responsible_guardian = Column(String)
     responsible_contact = Column(String)
     birth_date = Column(Date)
-
+    workspace_id = Column(Integer, ForeignKey("workspaces.workspace_id"))
     allergies = relationship(
         "Allergy", secondary=patients_allergies, back_populates="patients"
     )
+
+    workspace = relationship("Workspace", back_populates="patients")
 
 
 class PatientSchema(Schema):
