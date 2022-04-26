@@ -53,3 +53,17 @@ def update_workspace(id: int):
     session.commit()
 
     return jsonify(workspace), HTTPStatus.OK
+
+
+def delete_workspace(id: int):
+    session: Session = current_app.db.session
+
+    workspace = Workspace.query.get(id)
+
+    if not workspace:
+        return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
+
+    session.delete(workspace)
+    session.commit()
+
+    return {"msg": f"Workspace {workspace.name} deleted"}, HTTPStatus.OK
