@@ -1,6 +1,6 @@
 from http import HTTPStatus
 from flask import jsonify, request, current_app
-from app.models.user_model import User
+from app.models.user_model import User, UserSchema
 from sqlalchemy.orm import Session
 from app.configs.database import db
 
@@ -9,12 +9,19 @@ def create_user():
     session: Session = current_app.db.session
     data = request.json
 
+    address = data.pop("address")
+
+    print('>>>>> ',address)
+
+    schema = UserSchema()
+    schema.load(data)
+
     user = User(**data)
 
-    session.add(user)
-    session.commit()
+    # session.add(user)
+    # session.commit()
 
-    return jsonify(user), HTTPStatus.CREATED
+    return schema.dump(user), HTTPStatus.CREATED
 
 
 def get_user():

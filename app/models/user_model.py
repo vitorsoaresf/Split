@@ -4,17 +4,7 @@ from sqlalchemy import Column, Integer, String
 from marshmallow import Schema, fields
 
 
-@dataclass
 class User(db.Model):
-    user_id: int
-    name: str
-    registro: str
-    cpf: str
-    city: str
-    phone: str
-    email: str
-    funcao: str
-
     __tablename__ = "users"
 
     user_id = Column(Integer, primary_key=True)

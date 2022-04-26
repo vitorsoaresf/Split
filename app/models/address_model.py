@@ -10,6 +10,9 @@ class Address(db.Model):
     cep = Column(String(8), nullable=False)
     number_house = Column(String, nullable=False)
     complement = Column(String, nullable=False)
+    user_id = Column(
+        db.Integer, db.ForeignKey("users.user_id"), nullable=False, unique=True
+    )
 
     user = db.relationship("User", back_populates="user_id")
 
