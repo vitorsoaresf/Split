@@ -2,8 +2,9 @@ from dataclasses import dataclass
 from app.configs.database import db
 from sqlalchemy import ForeignKey, Integer, String, Column, Date, Boolean
 
+
 @dataclass
-class Patient(db.Model):
+class Tag(db.Model):
 
     tag: str
 
