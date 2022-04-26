@@ -37,3 +37,19 @@ def get_specific_workspace(id: int):
     return WorkspaceSchema().dump(workspace), HTTPStatus.OK
 
 
+def update_workspace(id: int):
+    session: Session = current_app.db.session
+
+    data = request.json
+
+    workspace = Workspace.query.get(id)
+
+    if not workspace:
+        return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
+
+    for key, value in data.items():
+        setattr(workspace, key, value)
+
+    session.commit()
+
+    return jsonify(workspace), HTTPStatus.OK
