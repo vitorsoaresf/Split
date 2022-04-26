@@ -21,7 +21,7 @@ class Workspace(db.Model):
     local = Column(String(256))
 
     users = db.relationship(
-        "Users", secondary="users_workspaces", back_populates="workspaces",uselist=True
+        "User", secondary="users_workspaces", back_populates="workspaces", uselist=True
     )
 
 

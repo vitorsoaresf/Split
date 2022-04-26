@@ -21,6 +21,11 @@ def get_user():
 
     users = User.query.all()
 
+    print(">>>>>>>. ", users)
+
+    # serializer_users = [user for user in users]
+    # print(serializer_users)
+
     return jsonify(users)
 
 

@@ -1,9 +1,18 @@
+from dataclasses import dataclass
 from app.configs.database import db
 from sqlalchemy import Column, Integer, String
 from marshmallow import Schema, fields
 
 
+@dataclass
 class User(db.Model):
+    user_id: int
+    name: str
+    crm: str
+    cpf: str
+    city: str
+    phone: str
+    email: str
 
     __tablename__ = "users"
 
