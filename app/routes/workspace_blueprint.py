@@ -5,3 +5,4 @@ bp = Blueprint("workspace", __name__, url_prefix="/workspaces")
 
 bp.get("")(workspace_controller.get_workspaces)
 bp.post("")(workspace_controller.create_workspace)
+bp.get("/<int:id>")(workspace_controller.get_specific_workspace)

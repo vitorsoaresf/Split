@@ -2,6 +2,7 @@ from http import HTTPStatus
 from flask import jsonify, request, current_app
 from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
+from app.models.patient_model import Patient, PatientSchema
 from sqlalchemy.orm import Session
 from app.models import User
 
@@ -45,7 +46,15 @@ def get_specific_workspace(id: int):
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
 
-    return WorkspaceSchema().dump(workspace), HTTPStatus.OK
+    print(workspace.users)
+
+    return {
+        "name": workspace.name,
+        "owner_id": workspace.owner_id,
+        "workspace_id": workspace.workspace_id,
+        "local": workspace.local,
+        "users": UserSchema(many=True).dump(workspace.users),
+        }, HTTPStatus.OK
 
 
 def update_workspace(id: int):
