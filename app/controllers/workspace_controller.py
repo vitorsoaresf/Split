@@ -1,25 +1,33 @@
 from http import HTTPStatus
 from flask import jsonify, request, current_app
+from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 from sqlalchemy.orm import Session
+from app.models import User
 
 
 def create_workspace():
     session: Session = current_app.db.session
     data = request.json
 
-    workspace = Workspace(**data)
+    schemaUser = UserSchema()
+    user = User.query.get(data["owner_id"])
+    if not user:
+        # return Exception
+        return {"error": "User not Found"}, HTTPStatus.BAD_REQUEST
 
     schema = WorkspaceSchema()
-
     schema.load(data)
 
+    workspace = Workspace(**data)
     session.add(workspace)
     session.commit()
 
-    response = schema.dump(workspace)
-
-    return response, HTTPStatus.CREATED
+    return {
+        "name": workspace.name,
+        "local": workspace.local,
+        "owner": schemaUser.dump(user),
+    }, HTTPStatus.CREATED
 
 
 def get_workspaces():

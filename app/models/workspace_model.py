@@ -17,21 +17,15 @@ class Workspace(db.Model):
     __tablename__ = "workspaces"
 
     workspace_id = Column(Integer, primary_key=True)
-    owner_id = Column(Integer, ForeignKey("users.user_id"))
-    name = Column(String)
-    local = Column(String)
+    owner_id = Column(Integer, nullable=False)
+    name = Column(String, nullable=False)
+    local = Column(String, nullable=False)
 
     users = db.relationship(
-        "User", secondary="users_workspaces",
-        back_populates="workspaces",
-        uselist=True
+        "User", secondary="users_workspaces", back_populates="workspaces", uselist=False
     )
 
-    patients = db.relationship(
-        "Patient",
-        back_populates="workspace",
-        uselist=True
-    )
+    patients = db.relationship("Patient", back_populates="workspace", uselist=True)
 
 
 class WorkspaceSchema(Schema):

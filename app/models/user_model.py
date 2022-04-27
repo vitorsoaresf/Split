@@ -23,7 +23,7 @@ class User(db.Model):
     )
 
     workspaces = db.relationship(
-        "Workspace", secondary="users_workspaces", back_populates="users", uselist=True
+        "Workspace", secondary="users_workspaces", back_populates="users"
     )
 
     address = db.relationship("Address", cascade="all,delete", back_populates="user")
