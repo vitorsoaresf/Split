@@ -20,15 +20,16 @@ def create_workspace():
     schema.load(data)
 
     workspace = Workspace(**data)
-    workspace.users = user
-
+    workspace.users.append(user)
+    
     session.add(workspace)
     session.commit()
 
     return {
         "name": workspace.name,
         "local": workspace.local,
-        "owner": schemaUser.dump(user),
+        "owner": user.name,
+        "workres": UserSchema(many=True).dump(workspace.users),
     }, HTTPStatus.CREATED
 
 

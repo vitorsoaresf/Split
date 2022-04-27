@@ -18,7 +18,7 @@ class User(db.Model):
 
     address_id = Column(
         Integer,
-        ForeignKey("address.address_id", ondelete="CASCADE"),
+        ForeignKey("address.address_id"),
         nullable=False,
         unique=True,
     )

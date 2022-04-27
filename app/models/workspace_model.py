@@ -23,7 +23,7 @@ class Workspace(db.Model):
     local = Column(String, nullable=False)
 
     users = db.relationship(
-        "User", secondary=users_workspaces, back_populates="workspaces", uselist=False
+        "User", secondary=users_workspaces, back_populates="workspaces", uselist=True
     )
 
     patients = db.relationship("Patient", back_populates="workspace", uselist=True)
