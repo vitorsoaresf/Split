@@ -1,6 +1,7 @@
 from app.configs.database import db
 from sqlalchemy import Column, Integer, String, ForeignKey
 from marshmallow import Schema, fields
+from .users_workspaces_table import users_workspaces
 
 
 class Workspace(db.Model):
@@ -22,7 +23,7 @@ class Workspace(db.Model):
     local = Column(String, nullable=False)
 
     users = db.relationship(
-        "User", secondary="users_workspaces", back_populates="workspaces", uselist=False
+        "User", secondary=users_workspaces, back_populates="workspaces", uselist=False
     )
 
     patients = db.relationship("Patient", back_populates="workspace", uselist=True)
