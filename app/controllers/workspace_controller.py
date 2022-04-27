@@ -87,3 +87,28 @@ def delete_workspace(id: int):
     session.commit()
 
     return {"msg": f"Workspace {workspace.name} deleted"}, HTTPStatus.OK
+
+
+def add_user_to_workspace(workspace_id: int):
+    session: Session = current_app.db.session
+    data = request.json
+
+    user = User.query.get(data["user_id"])
+    if not user:
+        return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
+
+    workspace = Workspace.query.get(workspace_id)
+    if not workspace:
+        return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
+
+    workspace.users.append(user)
+
+    session.commit()
+
+    return {
+        "name": workspace.name,
+        "owner_id": workspace.owner_id,
+        "workspace_id": workspace.workspace_id,
+        "local": workspace.local,
+        "users": UserSchema(many=True).dump(workspace.users),
+        }, HTTPStatus.OK
