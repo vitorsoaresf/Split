@@ -20,6 +20,8 @@ def create_workspace():
     schema.load(data)
 
     workspace = Workspace(**data)
+    workspace.users = user
+
     session.add(workspace)
     session.commit()
 

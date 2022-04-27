@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from app.configs.database import db
 from sqlalchemy import Column, Integer, String, ForeignKey
 from marshmallow import Schema, fields
+from .users_workspaces_table import users_workspaces
 
 
 class User(db.Model):
@@ -23,7 +24,10 @@ class User(db.Model):
     )
 
     workspaces = db.relationship(
-        "Workspace", secondary="users_workspaces", back_populates="users"
+        "Workspace",
+        cascade="all,delete",
+        secondary=users_workspaces,
+        back_populates="users",
     )
 
     address = db.relationship("Address", cascade="all,delete", back_populates="user")
