@@ -1,6 +1,7 @@
 from http import HTTPStatus
 from flask import jsonify, request, current_app
 from app.models.user_model import User, UserSchema
+from app.models.workspace_model import Workspace, WorkspaceSchema
 from sqlalchemy.orm import Session
 from app.models import Address, AddressSchema
 from app.configs.database import db
@@ -108,3 +109,14 @@ def delete_user(id: int):
     session.commit()
 
     return {"msg": f"User {user.name} deleted"}, HTTPStatus.OK
+
+
+def get_user_workspaces(id: int):
+    user = User.query.get(id)
+
+    if not user:
+        return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
+
+    return jsonify([{"name": wk["name"], "workspace_id": wk["workspace_id"]}
+                    for wk in WorkspaceSchema(many=True).dump(user.workspaces)
+                    ]), 200

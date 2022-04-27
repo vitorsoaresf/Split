@@ -21,7 +21,7 @@ def create_workspace():
 
     workspace = Workspace(**data)
     workspace.users.append(user)
-    
+
     session.add(workspace)
     session.commit()
 
