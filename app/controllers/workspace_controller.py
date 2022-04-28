@@ -56,13 +56,14 @@ def get_specific_workspace(id: int):
 
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
-
+    # print(workspace.patients)
     return {
         "name": workspace.name,
         "owner_id": workspace.owner_id,
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
         "users": UserSchema(many=True).dump(workspace.users),
+        "patients": workspace.patients,
     }, HTTPStatus.OK
 
 
