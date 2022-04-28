@@ -54,6 +54,7 @@ def get_users():
         }
 
         list_users.append(result_user)
+    print(list_users)
 
     return jsonify(list_users), HTTPStatus.OK
 
