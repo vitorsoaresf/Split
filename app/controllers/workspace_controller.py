@@ -37,7 +37,18 @@ def create_workspace():
 def get_workspaces():
     workspaces = Workspace.query.all()
 
-    return jsonify(WorkspaceSchema(many=True).dump(workspaces)), HTTPStatus.OK
+    list_response = [
+        {
+            "name": workspace.name,
+            "owner_id": workspace.owner_id,
+            "workspace_id": workspace.workspace_id,
+            "local": workspace.local,
+            "users": UserSchema(many=True).dump(workspace.users),
+        }
+        for workspace in workspaces
+    ]
+
+    return jsonify(list_response), HTTPStatus.OK
 
 
 def get_specific_workspace(id: int):
@@ -46,15 +57,13 @@ def get_specific_workspace(id: int):
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
 
-    print(workspace.users)
-
     return {
         "name": workspace.name,
         "owner_id": workspace.owner_id,
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
         "users": UserSchema(many=True).dump(workspace.users),
-        }, HTTPStatus.OK
+    }, HTTPStatus.OK
 
 
 def update_workspace(id: int):
@@ -111,4 +120,4 @@ def add_user_to_workspace(workspace_id: int):
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
         "users": UserSchema(many=True).dump(workspace.users),
-        }, HTTPStatus.OK
+    }, HTTPStatus.OK
