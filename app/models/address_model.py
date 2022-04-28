@@ -15,6 +15,8 @@ class Address(db.Model):
 
     user = db.relationship("User", back_populates="address", uselist=False)
 
+    patient = db.relationship("Patient", back_populates="address", uselist=False)
+
 
 class AddressSchema(Schema):
     """Address schema.
