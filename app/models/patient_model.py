@@ -1,12 +1,34 @@
 from datetime import datetime
+
 from app.configs.database import db
-from sqlalchemy import Integer, String, Column, DateTime, ForeignKey, Boolean
-from sqlalchemy.orm import relationship
-from .patient_allergie_table import patients_allergies
 from marshmallow import Schema, fields
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+
+from .patient_allergie_table import patients_allergies
 
 
 class Patient(db.Model):
+    """Patient model.
+    
+    This model represents a patient.
+    
+    Attributes:
+        patient_id: A unique integer value identifying the patient.
+        name: A string value with patient name.
+        gender: A string indication the patient gender.
+        hospitalization_date: A DateTime object indicating the day this patient joined the institution.
+        cpf: A string value with patient cpf.
+        profession: A string value with patient profession.
+        marital_status: A string value with patient marital status.
+        responsible_guardian: A string value with patient responsible guardian.
+        responsible_contact: A string value with patient responsible contact.
+        internation: A boolean value indicating if patient is internated.
+        birth_date: A DateTime object indicating the patient birth date.
+        
+        workspace_id: A id indicating the workspace this patient belongs to.
+        address_id: A id indicating the address information about this patient.    
+    """
 
     __tablename__ = "patients"
 
@@ -38,6 +60,28 @@ class Patient(db.Model):
 
 
 class PatientSchema(Schema):
+    """Patient Schema.
+    
+    This class represents the schema of the patient class.
+    Will check values and validate them.
+    
+    Attributes:
+        patient_id: A unique integer value identifying the data.
+        name: A string value with patient name.
+        gender: A string indication the patient gender.
+        hospitalization_date: A DateTime object indicating the day this patient joined the institution.
+        cpf: A string value with patient cpf.
+        profession: A string value with patient profession.
+        marital_status: A string value with patient marital status.
+        responsible_guardian: A string value with patient responsible guardian.
+        responsible_contact: A string value with patient responsible contact.
+        internation: A boolean value indicating if patient is internated.
+        birth_date: A DateTime object indicating the patient birth date.
+        
+        allergies: A list of patient allergies.
+        
+    """
+    
 
     patient_id = fields.Integer()
     name = fields.String()
