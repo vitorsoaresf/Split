@@ -15,6 +15,7 @@ class User(db.Model):
     phone = Column(String(11), nullable=False)
     email = Column(String, nullable=False, unique=True)
     profession = Column(String, nullable=False)
+    password_hash = Column(String, nullable=False)
 
     address_id = Column(
         Integer,
@@ -22,15 +23,13 @@ class User(db.Model):
         nullable=False,
         unique=True,
     )
-
     workspaces = db.relationship(
         "Workspace",
-        cascade="all,delete",
         secondary=users_workspaces,
         back_populates="users",
     )
 
-    address = db.relationship("Address", cascade="all,delete", back_populates="user")
+    address = db.relationship("Address", back_populates="user")
 
 
 class UserSchema(Schema):

@@ -31,7 +31,7 @@ class Workspace(db.Model):
 
     patients = db.relationship(
         "Patient",
-        back_populates="workspace",
+        back_populates="workspaces",
         uselist=True
         )
 
