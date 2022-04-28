@@ -1,9 +1,9 @@
 from datetime import datetime
 from app.configs.database import db
-from sqlalchemy import Integer, String, Column, Date, ForeignKey
+from sqlalchemy import Integer, String, Column, DateTime, ForeignKey, Boolean
 from sqlalchemy.orm import relationship
 from .patient_allergie_table import patients_allergies
-from marshmallow import Schema, fields, validate, validates
+from marshmallow import Schema, fields
 
 
 class Patient(db.Model):
@@ -13,19 +13,15 @@ class Patient(db.Model):
     patient_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     gender = Column(String, nullable=False)
-    hospitalization_date = Column(Date, default=datetime.now().strftime("%d %m %Y"))
-
-    # pode mudar conforme a necessidade
-    cpf = Column(String)
-
+    hospitalization_date = Column(DateTime, default=datetime.now().strftime("%d/%m/%Y"))
+    cpf = Column(String,nullable=False)
     profession = Column(String)
     marital_status = Column(String)
     responsible_guardian = Column(String)
     responsible_contact = Column(String)
-
-    # Formato Date não aceita 01/01/01 - formatar para date no marshemelow
-    # Coloquei como String só para efeturar o POST, mas estava com formato de Date
-    birth_date = Column(String)
+    internation = Column(Boolean)
+    #Fix in controllers
+    birth_date = Column(DateTime)
 
     workspace_id = Column(Integer, ForeignKey("workspaces.workspace_id"))
     address_id = Column(Integer, ForeignKey("address.address_id"))
@@ -34,11 +30,10 @@ class Patient(db.Model):
     allergies = relationship(
         "Allergy", secondary=patients_allergies, back_populates="patients"
     )
-
     workspace = relationship("Workspace", back_populates="patients")
 
     address = db.relationship(
-        "Address", cascade="all,delete", back_populates="patient", uselist=False
+        "Address", back_populates="patient", uselist=False
     )
 
 
