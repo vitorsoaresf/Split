@@ -1,6 +1,6 @@
 from app.configs.database import db
-from sqlalchemy import Column, Integer, String
 from marshmallow import Schema, fields
+from sqlalchemy import Column, Integer, String
 
 
 class Category(db.Model):
