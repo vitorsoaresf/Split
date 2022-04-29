@@ -30,7 +30,16 @@ def create_user():
     session.add(user)
     session.commit()
 
-    return schema.dump(user), HTTPStatus.CREATED
+    return {
+        "_id": user.user_id,
+        "name": user.name,
+        "profession": user.profession,
+        "cpf": user.cpf,
+        "phone": user.phone,
+        "email": user.email,
+        "profession_code": user.profession_code,
+        "address": address,
+    }, HTTPStatus.CREATED
 
 
 def get_users():
@@ -117,6 +126,12 @@ def get_user_workspaces(id: int):
     if not user:
         return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
 
-    return jsonify([{"name": wk["name"], "workspace_id": wk["workspace_id"]}
-                    for wk in WorkspaceSchema(many=True).dump(user.workspaces)
-                    ]), 200
+    return (
+        jsonify(
+            [
+                {"name": wk["name"], "workspace_id": wk["workspace_id"]}
+                for wk in WorkspaceSchema(many=True).dump(user.workspaces)
+            ]
+        ),
+        200,
+    )
