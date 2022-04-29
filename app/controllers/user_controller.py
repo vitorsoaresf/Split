@@ -1,10 +1,9 @@
 from http import HTTPStatus
 from flask import jsonify, request, current_app
 from app.models.user_model import User, UserSchema
-from app.models.workspace_model import Workspace, WorkspaceSchema
+from app.models.workspace_model import WorkspaceSchema
 from sqlalchemy.orm import Session
 from app.models import Address, AddressSchema
-from app.configs.database import db
 
 
 def create_user():
@@ -12,32 +11,34 @@ def create_user():
     data = request.json
 
     address = data.pop("address")
-    schema = AddressSchema()
-    schema.load(address)
+    address_schema = AddressSchema()
+    user_schema = UserSchema()
+    
+    try:
+        address_schema.load(address)
+        new_address = Address(**address)
 
-    res_address = Address(**address)
+        user_schema.load(data)
+        new_user = User(**data)
 
-    schema = UserSchema()
-    schema.load(data)
+        session.add(new_address)
+        session.commit()
 
-    user = User(**data)
+        new_user.address_id = new_address.address_id
 
-    session.add(res_address)
-    session.commit()
-
-    user.address_id = res_address.address_id
-
-    session.add(user)
-    session.commit()
-
+        session.add(new_user)
+        session.commit()
+    except:
+        return {"msg": "Error creating user", "user": user_schema.dump(new_user), "address": address_schema.dump(new_address)}, HTTPStatus.BAD_REQUEST
+    
     return {
-        "_id": user.user_id,
-        "name": user.name,
-        "profession": user.profession,
-        "cpf": user.cpf,
-        "phone": user.phone,
-        "email": user.email,
-        "profession_code": user.profession_code,
+        "_id": new_user.user_id,
+        "name": new_user.name,
+        "profession": new_user.profession,
+        "cpf": new_user.cpf,
+        "phone": new_user.phone,
+        "email": new_user.email,
+        "profession_code": new_user.profession_code,
         "address": address,
     }, HTTPStatus.CREATED
 
