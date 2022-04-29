@@ -91,7 +91,7 @@ def get_user_specific(id: int):
 
 def update_user(id: int):
     session: Session = current_app.db.session
-
+    schema = UserSchema()
     data = request.json
 
     user = User.query.get(id)
@@ -104,7 +104,7 @@ def update_user(id: int):
 
     session.commit()
 
-    return jsonify(user), HTTPStatus.OK
+    return schema.dump(user), HTTPStatus.OK
 
 
 def delete_user(id: int):
