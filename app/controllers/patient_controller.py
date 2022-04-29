@@ -27,14 +27,15 @@ def create_patient():
     res_address = Address(**address)
 
     schema = PatientSchema()
-    schema.load(data)
 
     session.add(res_address)
     session.commit()
 
+    data["address_id"] = res_address.address_id
+    data["workspace_id"] = workspace_id
+    
+    schema.load(data)
     patient = Patient(**data)
-    patient.address_id = res_address.address_id
-    patient.workspace_id = workspace.workspace_id
 
     session.add(patient)
     session.commit()
