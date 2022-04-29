@@ -62,7 +62,12 @@ def get_patients():
 
 # implementar esse metodo
 def get_patient_specific(id: int):
-    ...
+    patient = Patient.query.get_or_404(id, description="Patienc not found!")
+    workspace_id = patient.pop("workspace_id")
+    workspace = Workspace.query.get_or_404(workspace_id, description="Workspace not found!")
+    patient["workspace"] = workspace.name
+    return jsonify(patient), 200
+
 
 
 def delete_patient(id: int):
