@@ -13,17 +13,16 @@ def create_user():
     address = data.pop("address")
     address_schema = AddressSchema()
     user_schema = UserSchema()
-    
+
     try:
         address_schema.load(address)
         new_address = Address(**address)
-
         user_schema.load(data)
-        new_user = User(**data)
 
         session.add(new_address)
         session.commit()
 
+        new_user = User(**data)
         new_user.address_id = new_address.address_id
 
         session.add(new_user)
