@@ -7,9 +7,9 @@ from .users_workspaces_table import users_workspaces
 
 class User(db.Model):
     """User class.
-    
+
     This class represents information about users.
-    
+
     Attributes:
         user_id: A unique integer value identifying the data.
         name: A string value with user name.
@@ -19,9 +19,9 @@ class User(db.Model):
         email: A string value with user email.
         profession: A string value with user profession.
         password_hash: A string value with user password hash.
-    
+
     """
-    
+
     __tablename__ = "users"
 
     user_id = Column(Integer, primary_key=True)
@@ -71,3 +71,4 @@ class UserSchema(Schema):
     phone = fields.String()
     email = fields.String()
     profession = fields.String()
+    password_hash = fields.String()
