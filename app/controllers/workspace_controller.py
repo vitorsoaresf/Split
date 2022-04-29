@@ -1,5 +1,6 @@
 from http import HTTPStatus
 from flask import jsonify, request, current_app
+from app.models.category_model import Category, CategorySchema
 from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 from app.models.patient_model import Patient, PatientSchema
@@ -11,11 +12,17 @@ def create_workspace():
     session: Session = current_app.db.session
     data = request.json
 
-    schemaUser = UserSchema()
     user = User.query.get(data["owner_id"])
     if not user:
         # return Exception
-        return {"error": "User not Found"}, HTTPStatus.BAD_REQUEST
+        return {"error": "User-owner not Found"}, HTTPStatus.BAD_REQUEST
+
+    categories = data.pop("categories")
+
+    list_categories = []
+    for category in categories:
+        ct = Category.query.filter_by(category=category).first()
+        list_categories.append(ct)
 
     schema = WorkspaceSchema()
     schema.load(data)
@@ -23,14 +30,17 @@ def create_workspace():
     workspace = Workspace(**data)
     workspace.users.append(user)
 
+    workspace.categories.extend(list_categories)
+
     session.add(workspace)
     session.commit()
 
     return {
         "name": workspace.name,
+        "owner_id": workspace.owner_id,
+        "workspace_id": workspace.workspace_id,
         "local": workspace.local,
-        "owner": user.name,
-        "workres": UserSchema(many=True).dump(workspace.users),
+        "categories": CategorySchema(many=True).dump(workspace.categories),
     }, HTTPStatus.CREATED
 
 
@@ -43,7 +53,9 @@ def get_workspaces():
             "owner_id": workspace.owner_id,
             "workspace_id": workspace.workspace_id,
             "local": workspace.local,
-            "users": UserSchema(many=True).dump(workspace.users),
+            "categories": CategorySchema(many=True).dump(workspace.categories),
+            "workres": UserSchema(many=True).dump(workspace.users),
+            "patients": workspace.patients,
         }
         for workspace in workspaces
     ]
@@ -56,17 +68,19 @@ def get_specific_workspace(id: int):
 
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
-    # print(workspace.patients)
+
     return {
         "name": workspace.name,
         "owner_id": workspace.owner_id,
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
-        "users": UserSchema(many=True).dump(workspace.users),
+        "categories": CategorySchema(many=True).dump(workspace.categories),
+        "workres": UserSchema(many=True).dump(workspace.users),
         "patients": workspace.patients,
     }, HTTPStatus.OK
 
 
+# dá uma olhada com mais calma Dani para esse update
 def update_workspace(id: int):
     session: Session = current_app.db.session
 
@@ -85,10 +99,10 @@ def update_workspace(id: int):
     return jsonify(workspace), HTTPStatus.OK
 
 
-def delete_workspace(id: int):
+def delete_workspace(workspace_id: int):
     session: Session = current_app.db.session
 
-    workspace = Workspace.query.get(id)
+    workspace = Workspace.query.get(workspace_id)
 
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
@@ -120,5 +134,5 @@ def add_user_to_workspace(workspace_id: int):
         "owner_id": workspace.owner_id,
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
-        "users": UserSchema(many=True).dump(workspace.users),
+        "workres": UserSchema(many=True).dump(workspace.users),
     }, HTTPStatus.OK
