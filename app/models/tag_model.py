@@ -1,5 +1,5 @@
 from app.configs.database import db
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, missing
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 
 
@@ -44,6 +44,6 @@ class TagSchema(Schema):
 
     tag_id = fields.Integer()
     tag = fields.String()
-    data_id = fields.Integer(allow_none=True)
-    patient_id = fields.Integer(allow_none=True)
+    data_id = fields.Integer(missing=None)
+    patient_id = fields.Integer(missing=None)
     alert_tag = fields.Boolean()
