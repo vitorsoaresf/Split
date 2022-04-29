@@ -12,7 +12,8 @@ class Workspace(db.Model):
 
     Attributes:
         workspace_id: A unique integer value identifying the data.
-        owned_by: A integer value indicating the user id who owns the workspace.
+        owned_by: A integer value indicating the user id who
+                  owns the workspace.
         name: A string value with workspace name.
         local: A string field with workspace address.
     """
@@ -25,10 +26,17 @@ class Workspace(db.Model):
     local = Column(String, nullable=False)
 
     users = db.relationship(
-        "User", secondary=users_workspaces, back_populates="workspaces", uselist=True
+        "User",
+        secondary=users_workspaces,
+        back_populates="workspaces",
+        uselist=True
     )
 
-    patients = db.relationship("Patient", back_populates="workspace", uselist=True)
+    patients = db.relationship(
+        "Patient",
+        back_populates="workspace",
+        uselist=True
+    )
 
     categories = db.relationship(
         "Category",
@@ -46,7 +54,8 @@ class WorkspaceSchema(Schema):
 
     Attributes:
         workspace_id: A unique integer value identifying the data.
-        owner_id: A integer value indicating the user id who owns the workspace.
+        owner_id: A integer value indicating the user id who owns
+                  the workspace.
         name: A string value with workspace name.
         local: A string field with workspace address.
     """
