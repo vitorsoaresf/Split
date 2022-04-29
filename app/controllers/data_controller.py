@@ -3,6 +3,7 @@ from http import HTTPStatus
 from app.models import Data, DataSchema
 from flask import current_app, request
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 
 def create_data() -> dict:
@@ -24,8 +25,14 @@ def create_data() -> dict:
     data = request.json
     schema = DataSchema()
     
-    schema.load(data)
-    new_data = Data(**data)
+    try:
+        data["status"] = True
+        data["date"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        schema.load(data)
+        new_data = Data(**data)
+        
+    except:
+        return {"msg": "Data invalid"}, HTTPStatus.BAD_REQUEST
 
     session.add(new_data)
     session.commit()
