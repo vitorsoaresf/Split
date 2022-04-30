@@ -62,7 +62,9 @@ class Patient(db.Model):
 
     comments = db.relationship("Comment", back_populates="patient", uselist=True)
 
-    tags = db.relationship("Tag", back_populates="patient", uselist=True)
+    tags = db.relationship(
+        "Tag", cascade="all,delete", back_populates="patient", uselist=True
+    )
 
 
 class PatientSchema(Schema):
