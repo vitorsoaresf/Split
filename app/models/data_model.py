@@ -28,6 +28,11 @@ class Data(db.Model):
     
     patient_id = Column(Integer, db.ForeignKey('patients.patient_id'))
     category_id = Column(Integer, db.ForeignKey('categories.category_id'))
+
+    patient = db.relationship(
+        "Patient", back_populates="datas", uselist=False
+    )
+
     
     
 class DataSchema(Schema):

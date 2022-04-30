@@ -3,6 +3,8 @@ from flask import request, current_app, jsonify
 from sqlalchemy.orm import Session
 from app.models.address_model import Address, AddressSchema
 from app.models.allergy_model import Allergy, AllergySchema
+from app.models.comment_model import CommentSchema
+from app.models.data_model import DataSchema
 from app.models.patient_model import Patient, PatientSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 
@@ -109,6 +111,8 @@ def get_patient_specific(id: int):
         "birth_date": patient.birth_date,
         "workspace_id": patient.workspace_id,
         "address": schemaAddress.dump(address),
+        "datas": DataSchema(many=True).dump(patient.datas),
+        "datas": CommentSchema(many=True).dump(patient.comments)
     }, HTTPStatus.OK
 
 

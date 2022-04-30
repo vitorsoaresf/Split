@@ -25,7 +25,12 @@ class Comment(db.Model):
     comment = Column(Text, nullable=False)  # não está no diagrama.
     date_time = Column(DateTime, default=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
-    data_id = Column(Integer, ForeignKey("datas.data_id"), nullable=False)
+    patient_id = Column(Integer, ForeignKey("patients.patient_id"), nullable=False)
+    category_id = Column(Integer, ForeignKey("categories.category_id"), nullable=False)
+
+    patient = db.relationship(
+        "Patient", back_populates="comments", uselist=False
+    )
 
 
 class CommentSchema(Schema):
@@ -40,7 +45,9 @@ class CommentSchema(Schema):
         date_time: A string value with the date and time of the comment.
         user_id: A integer value indicating the user id who
                  created the comment.
-        data_id: A integer value indicating the data where the
+        patient_id: A integer value indicating the pattient who the
+                 comment is attached.
+        category_id: A integer value indicating the category where the
                  comment is attached.
     """
 
@@ -48,4 +55,5 @@ class CommentSchema(Schema):
     comment = fields.String()
     date_time = fields.DateTime()
     user_id = fields.Integer()
-    data_id = fields.Integer()
+    patient_id = fields.Integer()
+    category_id = fields.Integer()
