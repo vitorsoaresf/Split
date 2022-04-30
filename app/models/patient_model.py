@@ -54,13 +54,20 @@ class Patient(db.Model):
     allergies = relationship(
         "Allergy", secondary=patients_allergies, back_populates="patients"
     )
+
     workspace = relationship("Workspace", back_populates="patients")
 
-    address = db.relationship("Address", back_populates="patient", uselist=False)
+    address = db.relationship(
+        "Address", cascade="all,delete", back_populates="patient", uselist=False
+    )
 
-    datas = db.relationship("Data", back_populates="patient", uselist=True)
+    datas = db.relationship(
+        "Data", cascade="all,delete", back_populates="patient", uselist=True
+    )
 
-    comments = db.relationship("Comment", back_populates="patient", uselist=True)
+    comments = db.relationship(
+        "Comment", cascade="all,delete", back_populates="patient", uselist=True
+    )
 
     tags = db.relationship(
         "Tag", cascade="all,delete", back_populates="patient", uselist=True
