@@ -23,7 +23,7 @@ def create_comment():
         get_category = Category.query.get(data["category_id"])
         if not get_category:
             return {"error": "Category not Found"}, HTTPStatus.BAD_REQUEST
-        
+
         get_patient = Patient.query.get(data["patient_id"])
         if not get_patient:
             return {"error": "Patient not Found"}, HTTPStatus.BAD_REQUEST
@@ -36,16 +36,19 @@ def create_comment():
         return comment_schema.dump(comment), HTTPStatus.CREATED
 
     except ValidationError:
-        return {
-            "msg": """Error creating comment,
+        return (
+            {
+                "msg": """Error creating comment,
                       give the give the appropriate keys""",
-            "appropriate_keys": {
-                                "comment": "string",
-                                'patient_id': "integer",
-                                'user_id': "integer",
-                                'category_id': "integer"
-                                }
-            }, HTTPStatus.BAD_REQUEST
+                "appropriate_keys": {
+                    "comment": "string",
+                    "patient_id": "integer",
+                    "user_id": "integer",
+                    "category_id": "integer",
+                },
+            },
+            HTTPStatus.BAD_REQUEST,
+        )
 
 
 def update_comment(id: int):
@@ -68,11 +71,14 @@ def update_comment(id: int):
         return comment_schema.dump(comment), HTTPStatus.OK
 
     except ValidationError:
-        return {
-            "msg": """Error updating comment,
+        return (
+            {
+                "msg": """Error updating comment,
                       give the give the appropriate keys""",
-            "appropriate_keys": {"comment": "string"}
-            }, HTTPStatus.BAD_REQUEST
+                "appropriate_keys": {"comment": "string"},
+            },
+            HTTPStatus.BAD_REQUEST,
+        )
 
 
 def delete_comment(id: int):
