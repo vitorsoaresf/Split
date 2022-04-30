@@ -1,11 +1,12 @@
 from http import HTTPStatus
-from flask import jsonify, request, current_app
+
+from app.models import User
 from app.models.category_model import Category, CategorySchema
+from app.models.patient_model import Patient, PatientSchema
 from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
-from app.models.patient_model import Patient, PatientSchema
+from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
-from app.models import User
 
 
 def create_workspace():
@@ -14,7 +15,6 @@ def create_workspace():
 
     user = User.query.get(data["owner_id"])
     if not user:
-        # return Exception
         return {"error": "User-owner not Found"}, HTTPStatus.BAD_REQUEST
 
     categories = data.pop("categories")
@@ -80,10 +80,9 @@ def get_specific_workspace(id: int):
     }, HTTPStatus.OK
 
 
-# dá uma olhada com mais calma Dani para esse update
 def update_workspace(id: int):
     session: Session = current_app.db.session
-
+    schema = WorkspaceSchema()
     data = request.json
 
     workspace = Workspace.query.get(id)
@@ -96,7 +95,7 @@ def update_workspace(id: int):
 
     session.commit()
 
-    return jsonify(workspace), HTTPStatus.OK
+    return schema.dump(workspace), HTTPStatus.OK
 
 
 def delete_workspace(workspace_id: int):

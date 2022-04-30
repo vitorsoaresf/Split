@@ -5,36 +5,39 @@ from sqlalchemy import Column, ForeignKey, Integer, Text
 
 class Comment(db.Model):
     """Comment model.
-    
+
     This model represents comments about patients.
-    
+
     Attributes:
         comment_id: A integer value indicating the comment id.
         comment: A string value indicating the comment.
-        user_id: A integer value indicating the user id who created the comment.
-        patient_id: A integer value indicating the data where the comment is attached.
-    
+        user_id: A integer value indicating the user id who
+                 created the comment.
+        patient_id: A integer value indicating the data where
+                    the comment is attached.
     """
 
     __tablename__ = "comments"
 
-    comment_id = Column(Integer, primary_key=True) # ou comment_id
-    comment = Column(Text, nullable=False) # não está no diagrama.
+    comment_id = Column(Integer, primary_key=True)  # ou comment_id
+    comment = Column(Text, nullable=False)  # não está no diagrama.
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     data_id = Column(Integer, ForeignKey("datas.data_id"), nullable=False)
 
 
 class CommentSchema(Schema):
     """Comment model schema.
-    
+
     This model represents the schema of comments about patients.
     Will check values and validate them.
-    
+
     Attributes:
         comment_id: A unique integer value identifying the data.
         comment: A string value with comment.
-        user_id: A integer value indicating the user id who created the comment.
-        data_id: A integer value indicating the data where the comment is attached.
+        user_id: A integer value indicating the user id who
+                 created the comment.
+        data_id: A integer value indicating the data where the
+                 comment is attached.
     """
 
     comment_id = fields.Integer()

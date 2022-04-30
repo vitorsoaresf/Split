@@ -27,19 +27,21 @@ def create_patient():
     res_address = Address(**address)
 
     schema = PatientSchema()
-    schema.load(data)
 
     session.add(res_address)
     session.commit()
 
+    data["address_id"] = res_address.address_id
+    data["workspace_id"] = workspace_id
+
+    schema.load(data)
     patient = Patient(**data)
-    patient.address_id = res_address.address_id
-    patient.workspace_id = workspace.workspace_id
 
     session.add(patient)
     session.commit()
 
     return {
+        "_id": patient.patient_id,
         "name": patient.name,
         "gender": patient.gender,
         "cpf": patient.cpf,
@@ -62,7 +64,27 @@ def get_patients():
 
 # implementar esse metodo
 def get_patient_specific(id: int):
-    ...
+    patient = Patient.query.get(id)
+    schemaAddress = AddressSchema()
+
+    if not patient:
+        return {"msg": "Patient not Found"}, HTTPStatus.NOT_FOUND
+
+    address = Address.query.get(patient.address_id)
+
+    return {
+        "_id": patient.patient_id,
+        "name": patient.name,
+        "gender": patient.gender,
+        "cpf": patient.cpf,
+        "profession": patient.profession,
+        "marital_status": patient.marital_status,
+        "responsible_guardian": patient.responsible_guardian,
+        "responsible_contact": patient.responsible_contact,
+        "birth_date": patient.birth_date,
+        "workspace_id": patient.workspace_id,
+        "address": schemaAddress.dump(address),
+    }, HTTPStatus.OK
 
 
 def delete_patient(id: int):
@@ -78,3 +100,21 @@ def delete_patient(id: int):
 
     schema = PatientSchema()
     return "", HTTPStatus.NO_CONTENT
+
+
+def update_patient(id: int):
+    session: Session = current_app.db.session
+    schema = PatientSchema()
+    data = request.json
+
+    patient = Patient.query.get(id)
+
+    if not patient:
+        return {"msg": "Patient not Found"}, HTTPStatus.NOT_FOUND
+
+    for key, value in data.items():
+        setattr(patient, key, value)
+
+    session.commit()
+
+    return schema.dump(patient), HTTPStatus.OK
