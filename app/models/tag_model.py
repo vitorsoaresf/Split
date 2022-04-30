@@ -28,6 +28,8 @@ class Tag(db.Model):
 
     data = db.relationship("Data", back_populates="tags", uselist=False)
 
+    patient = db.relationship("Patient", back_populates="tags", uselist=False)
+
 
 class TagSchema(Schema):
     """Tag model schema.

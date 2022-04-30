@@ -43,7 +43,6 @@ def create_data() -> dict:
             obj = {
                 "tag": tag,
                 "data_id": new_data.data_id,
-                "patient_id": new_data.patient_id,
                 "alert_tag": False,
             }
             new_tag = Tag(**obj)
@@ -54,7 +53,6 @@ def create_data() -> dict:
             obj = {
                 "tag": alert,
                 "data_id": new_data.data_id,
-                "patient_id": new_data.patient_id,
                 "alert_tag": True,
             }
             new_tag = Tag(**obj)

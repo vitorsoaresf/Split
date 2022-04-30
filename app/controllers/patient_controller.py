@@ -6,12 +6,16 @@ from app.models.allergy_model import Allergy, AllergySchema
 from app.models.comment_model import CommentSchema
 from app.models.data_model import DataSchema
 from app.models.patient_model import Patient, PatientSchema
+from app.models.tag_model import Tag, TagSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 
 
 def create_patient():
     session: Session = current_app.db.session
     data = request.json
+
+    tags = data.pop("tags", [])
+    alerts = data.pop("alerts", [])
 
     workspace_id = data.pop("workspace_id")
     workspace = Workspace.query.get(workspace_id)
@@ -64,7 +68,27 @@ def create_patient():
     session.add(patient)
     session.commit()
 
-    print(patient)
+    for tag in tags:
+        obj = {
+            "tag": tag,
+            "patient_id": patient.patient_id,
+            "alert_tag": False,
+        }
+        new_tag = Tag(**obj)
+        session.add(new_tag)
+        patient.tags.append(new_tag)
+
+    for alert in alerts:
+        obj = {
+            "tag": alert,
+            "patient_id": patient.patient_id,
+            "alert_tag": True,
+        }
+        new_tag = Tag(**obj)
+        session.add(new_tag)
+        patient.tags.append(new_tag)
+
+        session.commit()
 
     return {
         "_id": patient.patient_id,
@@ -79,6 +103,7 @@ def create_patient():
         "workspace": schemaWorkspace.dump(workspace),
         "address": schemaAddress.dump(address),
         "allergies": AllergySchema(many=True).dump(list_allergies),
+        "tags": TagSchema(many=True).dump(patient.tags),
     }
 
 
