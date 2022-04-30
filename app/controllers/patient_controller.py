@@ -24,12 +24,13 @@ def create_patient():
         # raise Exception
         return {"error": "Workspace not found"}
 
-    address = data.pop("address")
+    address = data.pop("address", {})
 
     schemaAddress = AddressSchema()
-    schemaAddress.load(address)
+    if address:
+        schemaAddress.load(address)
 
-    allergies = data.pop("allergies")
+    allergies = data.pop("allergies", [])
 
     list_allergies = []
     for allergy in allergies:
@@ -50,14 +51,14 @@ def create_patient():
 
     # possivel erro de endereco com dados errados errado
 
-    res_address = Address(**address)
-
     schema = PatientSchema()
 
-    session.add(res_address)
-    session.commit()
+    if address:
+        res_address = Address(**address)
+        session.add(res_address)
+        session.commit()
+        data["address_id"] = res_address.address_id
 
-    data["address_id"] = res_address.address_id
     data["workspace_id"] = workspace_id
 
     schema.load(data)
