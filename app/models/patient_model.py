@@ -61,6 +61,13 @@ class Patient(db.Model):
         "Address", back_populates="patient", uselist=False
     )
 
+    datas = db.relationship(
+        "Data", back_populates="patient", uselist=True
+    )
+
+    commments = db.relationship(
+        "Comment", back_populates="patient", uselist=True
+    )
 
 class PatientSchema(Schema):
     """Patient Schema.

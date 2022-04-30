@@ -19,10 +19,11 @@ def create_user():
 
         password = data.pop("password")
         password_hash = generate_password_hash(password)
-        data.password_hash = password_hash
+        data["password_hash"] = password_hash
 
         address_schema.load(address)
         new_address = Address(**address)
+        print(address)
         user_schema.load(data)
 
         session.add(new_address)
@@ -34,7 +35,7 @@ def create_user():
         session.add(new_user)
         session.commit()
     except:
-        return {"msg": "Error creating user", "user": user_schema.dump(new_user), "address": address_schema.dump(new_address)}, HTTPStatus.BAD_REQUEST
+        return {"msg": "Error creating user", "user": data, "address": AddressSchema.dump(new_address)}, HTTPStatus.BAD_REQUEST
     
     return {
         "_id": new_user.user_id,
