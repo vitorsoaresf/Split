@@ -2,6 +2,7 @@ from http import HTTPStatus
 
 from app.models import User
 from app.models.address_model import AddressSchema
+from app.models.allergy_model import AllergySchema
 from app.models.category_model import Category, CategorySchema
 from app.models.comment_model import CommentSchema
 from app.models.data_model import DataSchema
@@ -57,8 +58,9 @@ def get_workspaces():
             "workspace_id": workspace.workspace_id,
             "local": workspace.local,
             "categories": CategorySchema(many=True).dump(workspace.categories),
-            "workres": UserSchema(many=True).dump(workspace.users),
-            "patients": workspace.patients,
+            "workers": UserSchema(many=True, exclude=["password_hash"]).dump(
+                workspace.users
+            ),
         }
         for workspace in workspaces
     ]
@@ -78,22 +80,28 @@ def get_specific_workspace(id: int):
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
         "categories": CategorySchema(many=True).dump(workspace.categories),
-        "workers": UserSchema(many=True, exclude=["password_hash"]).dump(workspace.users),
-        "patients": [{
-        "_id": patient.patient_id,
-        "name": patient.name,
-        "gender": patient.gender,
-        "cpf": patient.cpf,
-        "profession": patient.profession,
-        "marital_status": patient.marital_status,
-        "responsible_guardian": patient.responsible_guardian,
-        "responsible_contact": patient.responsible_contact,
-        "birth_date": patient.birth_date,
-        "workspace_id": patient.workspace_id,
-        "address": AddressSchema.dump(patient.address),
-        "datas": DataSchema(many=True).dump(patient.datas),
-        "comments": CommentSchema(many=True).dump(patient.comments)
-    } for patient in workspace.patients],
+        "workers": UserSchema(many=True, exclude=["password_hash"]).dump(
+            workspace.users
+        ),
+        "patients": [
+            {
+                "_id": patient.patient_id,
+                "name": patient.name,
+                "gender": patient.gender,
+                "cpf": patient.cpf,
+                "profession": patient.profession,
+                "marital_status": patient.marital_status,
+                "responsible_guardian": patient.responsible_guardian,
+                "responsible_contact": patient.responsible_contact,
+                "birth_date": patient.birth_date,
+                "workspace_id": patient.workspace_id,
+                "address": AddressSchema().dump(patient.address),
+                "datas": DataSchema(many=True).dump(patient.datas),
+                "comments": CommentSchema(many=True).dump(patient.comments),
+                "allergies": AllergySchema(many=True).dump(patient.allergies),
+            }
+            for patient in workspace.patients
+        ],
     }, HTTPStatus.OK
 
 
@@ -150,7 +158,9 @@ def add_user_to_workspace(workspace_id: int):
         "owner_id": workspace.owner_id,
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
-        "workres": UserSchema(many=True).dump(workspace.users),
+        "workers": UserSchema(many=True, exclude=["password_hash"]).dump(
+            workspace.users
+        ),
     }, HTTPStatus.OK
 
 

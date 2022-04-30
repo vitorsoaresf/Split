@@ -36,8 +36,7 @@ class Patient(db.Model):
     patient_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     gender = Column(String, nullable=False)
-    hospitalization_date = Column(
-        DateTime, default=datetime.now().strftime("%d/%m/%Y"))
+    hospitalization_date = Column(DateTime, default=datetime.now().strftime("%d/%m/%Y"))
     cpf = Column(String, nullable=False)
     profession = Column(String)
     marital_status = Column(String)
@@ -57,17 +56,14 @@ class Patient(db.Model):
     )
     workspace = relationship("Workspace", back_populates="patients")
 
-    address = db.relationship(
-        "Address", back_populates="patient", uselist=False
-    )
+    address = db.relationship("Address", back_populates="patient", uselist=False)
 
-    datas = db.relationship(
-        "Data", back_populates="patient", uselist=True
-    )
+    datas = db.relationship("Data", back_populates="patient", uselist=True)
 
-    comments = db.relationship(
-        "Comment", back_populates="patient", uselist=True
-    )
+    comments = db.relationship("Comment", back_populates="patient", uselist=True)
+
+    tags = db.relationship("Tag", back_populates="patient", uselist=True)
+
 
 class PatientSchema(Schema):
     """Patient Schema.

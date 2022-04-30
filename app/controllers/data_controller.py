@@ -5,57 +5,83 @@ from flask import current_app, request
 from sqlalchemy.orm import Session
 from datetime import datetime
 
+from app.models.tag_model import Tag
+
 
 def create_data() -> dict:
     """Create a new data.
-    
+
     This controller will create a new data.
-    
+
     Args:
         no args.
-        
+
     Returns:
         A dict with the data created.
-        
+
     Raises:
         ValidationError: If the data is not valid.
     """
-    
+
     session: Session = current_app.db.session
     data = request.json
     schema = DataSchema()
-    
+
+    tags = data.pop("tags", [])
+    alerts = data.pop("alerts", [])
+
     try:
         data["status"] = True
         data["date"] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         schema.load(data)
         new_data = Data(**data)
-        
+
+        session.add(new_data)
+        session.commit()
+
+        for tag in tags:
+            obj = {
+                "tag": tag,
+                "data_id": new_data.data_id,
+                "alert_tag": False,
+            }
+            new_tag = Tag(**obj)
+            session.add(new_tag)
+            new_data.tags.append(new_tag)
+
+        for alert in alerts:
+            obj = {
+                "tag": alert,
+                "data_id": new_data.data_id,
+                "alert_tag": True,
+            }
+            new_tag = Tag(**obj)
+            session.add(new_tag)
+            new_data.tags.append(new_tag)
+
+        session.commit()
+        return schema.dump(new_data), HTTPStatus.CREATED
+
     except:
-        return {"msg": "Data invalid"}, HTTPStatus.BAD_REQUEST
-
-    session.add(new_data)
-    session.commit()
-
-    return schema.dump(new_data), HTTPStatus.CREATED
+        return {"error": "Invalid request"}, HTTPStatus.BAD_REQUEST
 
 
 def get_data() -> dict:
     """Get all data.
-    
+
     This controller will get all the data.
-    
+
     Args:
         no args.
-        
+
     Returns:
         A dict with all the data.
-        
+
     Raises:
         No content: If there are no data.
     """
     schema = DataSchema(many=True)
-    
+
     data = Data.query.all()
 
     return schema.dump(data), HTTPStatus.OK
@@ -63,20 +89,20 @@ def get_data() -> dict:
 
 def get_data_specific(id: int) -> dict:
     """Get a specific data.
-    
+
     This controller will get a specific data.
-    
+
     Args:
         Id: The id of the data.
-        
+
     Returns:
         A dict with the data.
-        
+
     Raises:
         Not found: If the data is not found.
     """
     schema = DataSchema()
-    
+
     data = Data.query.get(id)
 
     if not data:
@@ -87,22 +113,22 @@ def get_data_specific(id: int) -> dict:
 
 def update_data(id: int) -> dict:
     """Update a specific data.
-    
+
     This controller will update a specific data.
-    
+
     Args:
         Id: The id of the data.
-        
+
     Returns:
         A dict with the data updated.
-        
+
     Raises:
         Not found: If the data is not found.
     """
     session: Session = current_app.db.session
     data = request.json
     schema = DataSchema()
-    
+
     schema.load(data)
     data = Data.query.get(id)
 
@@ -119,20 +145,20 @@ def update_data(id: int) -> dict:
 
 def delete_data(id: int) -> dict:
     """Delete a specific data.
-    
+
     This controller will delete a specific data.
-    
+
     Args:
         Id: The id of the data.
-        
+
     Returns:
         A dict with the data deleted.
-        
+
     Raises:
         Not found: If the data is not found.
     """
     session: Session = current_app.db.session
-    
+
     data = Data.query.get(id)
 
     if not data:
