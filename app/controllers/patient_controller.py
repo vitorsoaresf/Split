@@ -2,6 +2,7 @@ from http import HTTPStatus
 from flask import request, current_app, jsonify
 from sqlalchemy.orm import Session
 from app.models.address_model import Address, AddressSchema
+from app.models.allergy_model import Allergy, AllergySchema
 from app.models.patient_model import Patient, PatientSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 
@@ -22,6 +23,25 @@ def create_patient():
     schemaAddress = AddressSchema()
     schemaAddress.load(address)
 
+    allergies = data.pop("allergies")
+
+    list_allergies = []
+    for allergy in allergies:
+        al = Allergy.query.filter_by(name=allergy).first()
+
+        if not al:
+            obj = {"name": allergy}
+
+            schemaAllergy = AllergySchema()
+            schemaAllergy.load(obj)
+
+            al = Allergy(**obj)
+
+            session.add(al)
+            session.commit()
+
+        list_allergies.append(al)
+
     # possivel erro de endereco com dados errados errado
 
     res_address = Address(**address)
@@ -37,8 +57,12 @@ def create_patient():
     schema.load(data)
     patient = Patient(**data)
 
+    patient.allergies.extend(list_allergies)
+
     session.add(patient)
     session.commit()
+
+    print(patient)
 
     return {
         "_id": patient.patient_id,
@@ -52,6 +76,7 @@ def create_patient():
         "birth_date": patient.birth_date,
         "workspace": schemaWorkspace.dump(workspace),
         "address": schemaAddress.dump(address),
+        "allergies": AllergySchema(many=True).dump(list_allergies),
     }
 
 

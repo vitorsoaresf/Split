@@ -135,3 +135,26 @@ def add_user_to_workspace(workspace_id: int):
         "local": workspace.local,
         "workres": UserSchema(many=True).dump(workspace.users),
     }, HTTPStatus.OK
+
+
+def get_workspace_patients_categories(workspace_id: int):
+    workspace = Workspace.query.get(workspace_id)
+
+    if not workspace:
+        return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
+
+    patients = workspace.patients
+
+    workspace_categories = []
+    for categorie in Category.query.all():
+        if categorie.workspace_id == workspace_id:
+            workspace_categories.append(categorie)
+
+    return {
+        "workspace_id": workspace.workspace_id,
+        "name": workspace.name,
+        "local": workspace.local,
+        "owner_id": workspace.owner_id,
+        "patients": PatientSchema(many=True).dump(patients),
+        "categories": CategorySchema(many=True).dump(workspace_categories),
+    }, HTTPStatus.OK
