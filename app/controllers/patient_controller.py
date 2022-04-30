@@ -86,13 +86,33 @@ def get_patients():
     patients = Patient.query.all()
 
     # ele não retorna as amarrações com o ADDRESS e o WORKSPACE
-    return jsonify(PatientSchema(many=True).dump(patients)), HTTPStatus.OK
+    return (
+        jsonify(
+            [
+                {
+                    "_id": patient.patient_id,
+                    "name": patient.name,
+                    "gender": patient.gender,
+                    "cpf": patient.cpf,
+                    "profession": patient.profession,
+                    "marital_status": patient.marital_status,
+                    "responsible_guardian": patient.responsible_guardian,
+                    "responsible_contact": patient.responsible_contact,
+                    "birth_date": patient.birth_date,
+                    "workspace": WorkspaceSchema().dump(patient.workspace),
+                    "address": AddressSchema().dump(patient.address),
+                    "allergies": AllergySchema(many=True).dump(patient.allergies),
+                }
+                for patient in patients
+            ]
+        ),
+        HTTPStatus.OK,
+    )
 
 
 # implementar esse metodo
 def get_patient_specific(id: int):
     patient = Patient.query.get(id)
-    schemaAddress = AddressSchema()
 
     if not patient:
         return {"msg": "Patient not Found"}, HTTPStatus.NOT_FOUND
@@ -110,9 +130,9 @@ def get_patient_specific(id: int):
         "responsible_contact": patient.responsible_contact,
         "birth_date": patient.birth_date,
         "workspace_id": patient.workspace_id,
-        "address": schemaAddress.dump(address),
+        "address": AddressSchema().dump(address),
         "datas": DataSchema(many=True).dump(patient.datas),
-        "comments": CommentSchema(many=True).dump(patient.comments)
+        "comments": CommentSchema(many=True).dump(patient.comments),
     }, HTTPStatus.OK
 
 
@@ -146,4 +166,18 @@ def update_patient(id: int):
 
     session.commit()
 
-    return schema.dump(patient), HTTPStatus.OK
+    return {
+        "_id": patient.patient_id,
+        "name": patient.name,
+        "gender": patient.gender,
+        "cpf": patient.cpf,
+        "profession": patient.profession,
+        "marital_status": patient.marital_status,
+        "responsible_guardian": patient.responsible_guardian,
+        "responsible_contact": patient.responsible_contact,
+        "birth_date": patient.birth_date,
+        "workspace_id": patient.workspace_id,
+        "address": AddressSchema().dump(patient.address),
+        "datas": DataSchema(many=True).dump(patient.datas),
+        "comments": CommentSchema(many=True).dump(patient.comments),
+    }, HTTPStatus.OK
