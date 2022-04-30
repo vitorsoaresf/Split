@@ -112,7 +112,7 @@ def get_patient_specific(id: int):
         "workspace_id": patient.workspace_id,
         "address": schemaAddress.dump(address),
         "datas": DataSchema(many=True).dump(patient.datas),
-        "datas": CommentSchema(many=True).dump(patient.comments)
+        "comments": CommentSchema(many=True).dump(patient.comments)
     }, HTTPStatus.OK
 
 

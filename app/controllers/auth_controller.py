@@ -21,11 +21,11 @@ def login():
 
         user : User = session.query(User).filter_by(email = user_email).first()
 
-        if not check_password_hash(user.email, user_password): 
+        if not check_password_hash(user.password_hash, user_password): 
 
             raise ValueError
         
-        return {"token"}, HTTPStatus.OK
+        return {"token": "abacaxi"}, HTTPStatus.OK
     
     except:
 

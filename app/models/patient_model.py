@@ -65,7 +65,7 @@ class Patient(db.Model):
         "Data", back_populates="patient", uselist=True
     )
 
-    commments = db.relationship(
+    comments = db.relationship(
         "Comment", back_populates="patient", uselist=True
     )
 

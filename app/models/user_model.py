@@ -71,4 +71,4 @@ class UserSchema(Schema):
     phone = fields.String()
     email = fields.String()
     profession = fields.String()
-    password = fields.String()
+    password_hash = fields.String()
