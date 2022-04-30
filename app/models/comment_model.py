@@ -1,6 +1,7 @@
 from app.configs.database import db
 from marshmallow import Schema, fields
-from sqlalchemy import Column, ForeignKey, Integer, Text
+from sqlalchemy import Column, ForeignKey, Integer, Text, DateTime
+from datetime import datetime
 
 
 class Comment(db.Model):
@@ -11,6 +12,7 @@ class Comment(db.Model):
     Attributes:
         comment_id: A integer value indicating the comment id.
         comment: A string value indicating the comment.
+        date_time: A datetime value indicating the date and time of the comment.
         user_id: A integer value indicating the user id who
                  created the comment.
         patient_id: A integer value indicating the data where
@@ -21,6 +23,7 @@ class Comment(db.Model):
 
     comment_id = Column(Integer, primary_key=True)  # ou comment_id
     comment = Column(Text, nullable=False)  # não está no diagrama.
+    date_time = Column(DateTime, default=datetime.now().strftime("%d/%m/%Y %H:%M:%S"))
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     data_id = Column(Integer, ForeignKey("datas.data_id"), nullable=False)
 
@@ -34,6 +37,7 @@ class CommentSchema(Schema):
     Attributes:
         comment_id: A unique integer value identifying the data.
         comment: A string value with comment.
+        date_time: A string value with the date and time of the comment.
         user_id: A integer value indicating the user id who
                  created the comment.
         data_id: A integer value indicating the data where the
@@ -42,5 +46,6 @@ class CommentSchema(Schema):
 
     comment_id = fields.Integer()
     comment = fields.String()
+    date_time = fields.DateTime()
     user_id = fields.Integer()
     data_id = fields.Integer()
