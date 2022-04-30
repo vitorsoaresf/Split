@@ -31,7 +31,9 @@ class Data(db.Model):
 
     patient = db.relationship("Patient", back_populates="datas", uselist=False)
 
-    tags = db.relationship("Tag", back_populates="data", uselist=True)
+    tags = db.relationship(
+        "Tag", cascade="all,delete", back_populates="data", uselist=True
+    )
 
 
 class DataSchema(Schema):
