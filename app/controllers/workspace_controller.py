@@ -78,7 +78,7 @@ def get_specific_workspace(id: int):
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
         "categories": CategorySchema(many=True).dump(workspace.categories),
-        "workspaces": UserSchema(many=True).dump(workspace.users),
+        "workers": UserSchema(many=True, exclude=["password_hash"]).dump(workspace.users),
         "patients": [{
         "_id": patient.patient_id,
         "name": patient.name,
