@@ -4,17 +4,23 @@ from app.models.user_model import User, UserSchema
 from app.models.workspace_model import WorkspaceSchema
 from sqlalchemy.orm import Session
 from app.models import Address, AddressSchema
+from werkzeug.security import generate_password_hash
 
 
 def create_user():
     session: Session = current_app.db.session
     data = request.json
-
-    address = data.pop("address")
+    
     address_schema = AddressSchema()
     user_schema = UserSchema()
 
     try:
+        address = data.pop("address")
+
+        password = data.pop("password")
+        password_hash = generate_password_hash(password)
+        data.password_hash = password_hash
+
         address_schema.load(address)
         new_address = Address(**address)
         user_schema.load(data)
@@ -100,6 +106,11 @@ def update_user(id: int):
         return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
 
     for key, value in data.items():
+
+        if key == "password":
+            value_hash = generate_password_hash(value)
+            setattr(user,key, value_hash)
+
         setattr(user, key, value)
 
     session.commit()
