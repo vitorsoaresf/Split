@@ -11,7 +11,7 @@ from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
-
+from app.models.tag_model import TagSchema
 
 def create_workspace():
     session: Session = current_app.db.session
@@ -84,21 +84,23 @@ def get_specific_workspace(id: int):
             workspace.users
         ),
         "patients": [
-            {
-                "_id": patient.patient_id,
-                "name": patient.name,
-                "gender": patient.gender,
-                "cpf": patient.cpf,
-                "profession": patient.profession,
-                "marital_status": patient.marital_status,
-                "responsible_guardian": patient.responsible_guardian,
-                "responsible_contact": patient.responsible_contact,
-                "birth_date": patient.birth_date,
-                "workspace_id": patient.workspace_id,
-                "address": AddressSchema().dump(patient.address),
+            {   "info": {
+                        "_id": patient.patient_id,
+                        "name": patient.name,
+                        "gender": patient.gender,
+                        "cpf": patient.cpf,
+                        "profession": patient.profession,
+                        "marital_status": patient.marital_status,
+                        "responsible_guardian": patient.responsible_guardian,
+                        "responsible_contact": patient.responsible_contact,
+                        "birth_date": patient.birth_date,
+                        "workspace_id": patient.workspace_id,
+                        "address": AddressSchema().dump(patient.address),
+                        "tags":TagSchema(many=True).dump(patient.tags),
+                        "allergies": AllergySchema(many=True).dump(patient.allergies)
+                        },
                 "datas": DataSchema(many=True).dump(patient.datas),
                 "comments": CommentSchema(many=True).dump(patient.comments),
-                "allergies": AllergySchema(many=True).dump(patient.allergies),
             }
             for patient in workspace.patients
         ],
