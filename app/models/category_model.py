@@ -28,6 +28,8 @@ class Category(db.Model):
 
     datas = db.relationship("Data", back_populates="category", uselist=True)
 
+    comments = db.relationship("Comment", back_populates="category", uselist=True)
+
 
 class CategorySchema(Schema):
     """Category model schema.
