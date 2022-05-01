@@ -17,6 +17,11 @@ def create_patient():
     tags = data.pop("tags", [])
     alerts = data.pop("alerts", [])
 
+    #Normalization
+    data['name'] = data['name'].title()
+    data['profession'] = data['profession'].title()
+    data['response_guardian'] = data['response_guardian'].title()
+
     workspace_id = data.pop("workspace_id")
     workspace = Workspace.query.get(workspace_id)
     schemaWorkspace = WorkspaceSchema()
@@ -34,6 +39,10 @@ def create_patient():
 
     list_allergies = []
     for allergy in allergies:
+        
+        #Normalization
+        allergy = allergy.casefold()
+
         al = Allergy.query.filter_by(name=allergy).first()
 
         if not al:

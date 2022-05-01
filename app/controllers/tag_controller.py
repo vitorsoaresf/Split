@@ -27,6 +27,9 @@ def create_tag():
     schema = TagSchema()
     schema.load(data)
 
+    #Normalization
+    data['tag'] = data['tag'].casefold()
+
     tag = Tag(**data)
 
     session.add(tag)

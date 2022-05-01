@@ -11,6 +11,9 @@ def create_user():
     session: Session = current_app.db.session
     data = request.json
     
+
+
+
     address_schema = AddressSchema()
     user_schema = UserSchema()
 
@@ -23,11 +26,16 @@ def create_user():
 
         address_schema.load(address)
         new_address = Address(**address)
-        print(address)
         user_schema.load(data)
 
         session.add(new_address)
         session.commit()
+
+        #Normalization
+        data['name'] = data['name'].title()
+        data['email'] = data['email'].casefold()
+        data['profession'] = data['profession'].title()
+        data['function'] =  data['function'].title()
 
         new_user = User(**data)
         new_user.address_id = new_address.address_id
@@ -70,7 +78,6 @@ def get_users():
         }
 
         list_users.append(result_user)
-    print(list_users)
 
     return jsonify(list_users), HTTPStatus.OK
 
