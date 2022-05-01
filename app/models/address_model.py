@@ -1,9 +1,22 @@
 from app.configs.database import db
-from sqlalchemy import Column, Integer, String
 from marshmallow import Schema, fields
+from sqlalchemy import Column, Integer, String
 
 
 class Address(db.Model):
+    """Address model.
+    
+    This class represents information about addresses.
+    This class is used to store addresses of patients and users.
+    
+    Attributes:
+        address_id: A unique integer value identifying the address.
+        street: A string value indicating the street name.
+        cep: A string value indicating the CEP code.
+        number_house: A string value indicating the house number.
+        complement: A string value indicating other information about address.
+    
+    """
 
     __tablename__ = "address"
 

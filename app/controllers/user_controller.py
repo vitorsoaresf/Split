@@ -1,10 +1,9 @@
 from http import HTTPStatus
 from flask import jsonify, request, current_app
 from app.models.user_model import User, UserSchema
-from app.models.workspace_model import Workspace, WorkspaceSchema
+from app.models.workspace_model import WorkspaceSchema
 from sqlalchemy.orm import Session
 from app.models import Address, AddressSchema
-from app.configs.database import db
 
 
 def create_user():
@@ -12,25 +11,35 @@ def create_user():
     data = request.json
 
     address = data.pop("address")
-    schema = AddressSchema()
-    schema.load(address)
+    address_schema = AddressSchema()
+    user_schema = UserSchema()
 
-    res_address = Address(**address)
+    try:
+        address_schema.load(address)
+        new_address = Address(**address)
+        user_schema.load(data)
 
-    schema = UserSchema()
-    schema.load(data)
+        session.add(new_address)
+        session.commit()
 
-    user = User(**data)
+        new_user = User(**data)
+        new_user.address_id = new_address.address_id
 
-    session.add(res_address)
-    session.commit()
-
-    user.address_id = res_address.address_id
-
-    session.add(user)
-    session.commit()
-
-    return schema.dump(user), HTTPStatus.CREATED
+        session.add(new_user)
+        session.commit()
+    except:
+        return {"msg": "Error creating user", "user": user_schema.dump(new_user), "address": address_schema.dump(new_address)}, HTTPStatus.BAD_REQUEST
+    
+    return {
+        "_id": new_user.user_id,
+        "name": new_user.name,
+        "profession": new_user.profession,
+        "cpf": new_user.cpf,
+        "phone": new_user.phone,
+        "email": new_user.email,
+        "profession_code": new_user.profession_code,
+        "address": address,
+    }, HTTPStatus.CREATED
 
 
 def get_users():
@@ -54,6 +63,7 @@ def get_users():
         }
 
         list_users.append(result_user)
+    print(list_users)
 
     return jsonify(list_users), HTTPStatus.OK
 
@@ -81,7 +91,7 @@ def get_user_specific(id: int):
 
 def update_user(id: int):
     session: Session = current_app.db.session
-
+    schema = UserSchema()
     data = request.json
 
     user = User.query.get(id)
@@ -94,7 +104,7 @@ def update_user(id: int):
 
     session.commit()
 
-    return jsonify(user), HTTPStatus.OK
+    return schema.dump(user), HTTPStatus.OK
 
 
 def delete_user(id: int):
@@ -117,6 +127,12 @@ def get_user_workspaces(id: int):
     if not user:
         return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
 
-    return jsonify([{"name": wk["name"], "workspace_id": wk["workspace_id"]}
-                    for wk in WorkspaceSchema(many=True).dump(user.workspaces)
-                    ]), 200
+    return (
+        jsonify(
+            [
+                {"name": wk["name"], "workspace_id": wk["workspace_id"]}
+                for wk in WorkspaceSchema(many=True).dump(user.workspaces)
+            ]
+        ),
+        200,
+    )

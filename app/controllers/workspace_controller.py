@@ -3,6 +3,7 @@ from flask import jsonify, request, current_app
 from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 from app.models.patient_model import Patient, PatientSchema
+from app.models.category_model import Category, CategorySchema
 from sqlalchemy.orm import Session
 from app.models import User
 
@@ -27,10 +28,11 @@ def create_workspace():
     session.commit()
 
     return {
+        "workspace_id": workspace.workspace_id,
         "name": workspace.name,
         "local": workspace.local,
         "owner": user.name,
-        "workres": UserSchema(many=True).dump(workspace.users),
+        "workers": UserSchema(many=True).dump(workspace.users),
     }, HTTPStatus.CREATED
 
 
@@ -56,19 +58,20 @@ def get_specific_workspace(id: int):
 
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
-
+    # print(workspace.patients)
     return {
         "name": workspace.name,
         "owner_id": workspace.owner_id,
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
         "users": UserSchema(many=True).dump(workspace.users),
+        "patients": workspace.patients,
     }, HTTPStatus.OK
 
 
 def update_workspace(id: int):
     session: Session = current_app.db.session
-
+    schema = WorkspaceSchema()
     data = request.json
 
     workspace = Workspace.query.get(id)
@@ -81,7 +84,7 @@ def update_workspace(id: int):
 
     session.commit()
 
-    return jsonify(workspace), HTTPStatus.OK
+    return schema.dump(workspace), HTTPStatus.OK
 
 
 def delete_workspace(id: int):
@@ -120,4 +123,27 @@ def add_user_to_workspace(workspace_id: int):
         "workspace_id": workspace.workspace_id,
         "local": workspace.local,
         "users": UserSchema(many=True).dump(workspace.users),
+    }, HTTPStatus.OK
+
+
+def get_workspace_patients_categories(workspace_id: int):
+    workspace = Workspace.query.get(workspace_id)
+
+    if not workspace:
+        return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
+
+    patients = workspace.patients
+
+    workspace_categories = []
+    for categorie in Category.query.all():
+        if categorie.workspace_id == workspace_id:
+            workspace_categories.append(categorie)
+
+    return {
+        "workspace_id": workspace.workspace_id,
+        "name": workspace.name,
+        "local": workspace.local,
+        "owner_id": workspace.owner_id,
+        "patients": PatientSchema(many=True).dump(patients),
+        "categories": CategorySchema(many=True).dump(workspace_categories)
     }, HTTPStatus.OK

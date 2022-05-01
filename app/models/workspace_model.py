@@ -2,6 +2,7 @@ from app.configs.database import db
 from sqlalchemy import Column, Integer, String, ForeignKey
 from marshmallow import Schema, fields
 from .users_workspaces_table import users_workspaces
+from .categories_workspaces_table import categories_workspaces
 
 
 class Workspace(db.Model):
@@ -11,6 +12,8 @@ class Workspace(db.Model):
 
     Attributes:
         workspace_id: A unique integer value identifying the data.
+        owned_by: A integer value indicating the user id who
+                  owns the workspace.
         name: A string value with workspace name.
         local: A string field with workspace address.
     """
@@ -33,7 +36,14 @@ class Workspace(db.Model):
         "Patient",
         back_populates="workspace",
         uselist=True
-        )
+    )
+
+    categories = db.relationship(
+        "Category",
+        secondary=categories_workspaces,
+        back_populates="workspace",
+        uselist=True,
+    )
 
 
 class WorkspaceSchema(Schema):
@@ -44,6 +54,8 @@ class WorkspaceSchema(Schema):
 
     Attributes:
         workspace_id: A unique integer value identifying the data.
+        owner_id: A integer value indicating the user id who owns
+                  the workspace.
         name: A string value with workspace name.
         local: A string field with workspace address.
     """

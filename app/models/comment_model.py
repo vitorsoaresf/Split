@@ -1,12 +1,20 @@
 from app.configs.database import db
-from sqlalchemy import Integer, Column, Text, ForeignKey
-from sqlalchemy.orm import relationship
-from dataclasses import dataclass
+from marshmallow import Schema, fields
+from sqlalchemy import Column, ForeignKey, Integer, Text
 
-@dataclass
+
 class Comment(db.Model):
-
-    comment: str
+    """Comment model.
+    
+    This model represents comments about patients.
+    
+    Attributes:
+        comment_id: A integer value indicating the comment id.
+        comment: A string value indicating the comment.
+        user_id: A integer value indicating the user id who created the comment.
+        patient_id: A integer value indicating the data where the comment is attached.
+    
+    """
 
     __tablename__ = "comments"
 
@@ -15,3 +23,21 @@ class Comment(db.Model):
     user_id = Column(Integer, ForeignKey("users.user_id"), nullable=False)
     data_id = Column(Integer, ForeignKey("datas.data_id"), nullable=False)
 
+
+class CommentSchema(Schema):
+    """Comment model schema.
+    
+    This model represents the schema of comments about patients.
+    Will check values and validate them.
+    
+    Attributes:
+        comment_id: A unique integer value identifying the data.
+        comment: A string value with comment.
+        user_id: A integer value indicating the user id who created the comment.
+        data_id: A integer value indicating the data where the comment is attached.
+    """
+
+    comment_id = fields.Integer()
+    comment = fields.String()
+    user_id = fields.Integer()
+    data_id = fields.Integer()
