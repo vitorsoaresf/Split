@@ -1,3 +1,5 @@
+from collections import UserList
+from unicodedata import category
 from app.configs.database import db
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from marshmallow import Schema, fields
@@ -34,6 +36,8 @@ class Data(db.Model):
     tags = db.relationship(
         "Tag", cascade="all,delete", back_populates="data", uselist=True
     )
+
+    category = db.relationship("Category", back_populates="datas", uselist=False)
 
 
 class DataSchema(Schema):
