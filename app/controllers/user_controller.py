@@ -7,11 +7,26 @@ from app.models import Address, AddressSchema
 from werkzeug.security import generate_password_hash
 from app.services.adress_service import svc_update_address, svc_create_address
 
-def create_user():
+def create_user() -> dict:
+    """Create new Users.
+    
+    A controller to create new users.
+    
+    Args:
+        Receive no args.
+        Get the name, profession, cpf, phone, email, profession_code, password and address from the request.
+        
+    Returns:
+        A json with the new user. HTTPStatus.CREATED if the user was created.
+        
+    Raises:
+        HTTPStatus.BAD_REQUEST: If the request is not valid.
+    
+    """
+    
     session: Session = current_app.db.session
     data = request.json
 
-    address_schema = AddressSchema()
     user_schema = UserSchema()
 
     try:
@@ -51,7 +66,20 @@ def create_user():
     }, HTTPStatus.CREATED
 
 
-def get_users():
+def get_users() -> dict:
+    """Get all users.
+    
+    A controller to get all users.
+    
+    Args:
+        Receive no args.
+        
+    Returns:
+        A json with all users. HTTPStatus.OK if users was found.
+        
+    Raises:
+    
+    """
     schemaAddress = AddressSchema()
 
     users = User.query.all()
@@ -76,7 +104,22 @@ def get_users():
     return jsonify(list_users), HTTPStatus.OK
 
 
-def get_user_specific(id: int):
+def get_user_specific(id: int) -> dict:
+    """Get a specific user.
+    
+    A controller to get a specific user.
+    
+    Args:
+        Receive the id of the user.
+        
+    Returns:
+        A json with the user. HTTPStatus.OK if the user was found.
+        
+    Raises:
+        
+    
+    """
+    
     user = User.query.get(id)
     schemaAddress = AddressSchema()
 
@@ -98,7 +141,22 @@ def get_user_specific(id: int):
     }, HTTPStatus.OK
 
 
-def update_user(id: int):
+def update_user(id: int) -> dict:
+    """Update a specific user.
+    
+    A controller to update a specific user.
+    
+    Args:
+        Receive the id of the user.
+        
+    Returns:
+        A json with the user. HTTPStatus.OK if the user was found.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the user was not found.
+    
+    """
+
     session: Session = current_app.db.session
     data = request.get_json()
 
@@ -125,7 +183,22 @@ def update_user(id: int):
     return UserSchema(exclude=["password_hash"]).dump(user), HTTPStatus.OK
 
 
-def delete_user(id: int):
+def delete_user(id: int) -> str:
+    """Delete a specific user.
+    
+    A controller to delete a specific user.
+    
+    Args:
+        Receive the id of the user.
+        
+    Returns:
+        A json with a msg: string with the name and a message. HTTPStatus.OK if the user was deleted.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the user was not found.
+    
+    """
+    
     session: Session = current_app.db.session
 
     user = User.query.get(id)
