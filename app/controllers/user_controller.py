@@ -5,37 +5,31 @@ from app.models.workspace_model import WorkspaceSchema
 from sqlalchemy.orm import Session
 from app.models import Address, AddressSchema
 from werkzeug.security import generate_password_hash
-
+from app.services.adress_service import svc_update_address, svc_create_address
 
 def create_user():
     session: Session = current_app.db.session
     data = request.json
-    
-
-
 
     address_schema = AddressSchema()
     user_schema = UserSchema()
 
     try:
         address = data.pop("address")
+        new_address = svc_create_address(address)
+        session.add(new_address)
+        session.commit()
 
         password = data.pop("password")
         password_hash = generate_password_hash(password)
         data["password_hash"] = password_hash
 
-        address_schema.load(address)
-        new_address = Address(**address)
         user_schema.load(data)
-
-        session.add(new_address)
-        session.commit()
 
         #Normalization
         data['name'] = data['name'].title()
         data['email'] = data['email'].casefold()
         data['profession'] = data['profession'].title()
-        data['function'] =  data['function'].title()
 
         new_user = User(**data)
         new_user.address_id = new_address.address_id
@@ -109,6 +103,11 @@ def update_user(id: int):
     data = request.get_json()
 
     user = User.query.get(id)
+
+    if 'address' in data.keys():
+        new_address = data.pop('address')
+        address_id = user.address_id
+        svc_update_address(address_id, new_address)
 
     if not user:
         return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
