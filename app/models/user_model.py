@@ -47,6 +47,8 @@ class User(db.Model):
 
     address = db.relationship("Address", back_populates="user")
 
+    comments = db.relationship("Comment", back_populates="user", uselist=True)
+
 
 class UserSchema(Schema):
     """User schema.
