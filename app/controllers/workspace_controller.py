@@ -28,8 +28,12 @@ def create_workspace():
         ct = Category.query.filter_by(category=category).first()
         list_categories.append(ct)
 
+
     schema = WorkspaceSchema()
     schema.load(data)
+
+    data['name'].upper()
+    data['local'].upper()
 
     workspace = Workspace(**data)
     workspace.users.append(user)
