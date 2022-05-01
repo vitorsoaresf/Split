@@ -6,12 +6,13 @@ from app.models.allergy_model import AllergySchema
 from app.models.category_model import Category, CategorySchema
 from app.models.comment_model import CommentSchema
 from app.models.data_model import DataSchema
-from app.models.patient_model import Patient, PatientSchema
+from app.models.patient_model import PatientSchema
+from app.models.tag_model import TagSchema
 from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
-from app.models.tag_model import TagSchema
+
 
 def create_workspace() -> dict:
     """Create new Workspaces.
@@ -199,7 +200,7 @@ def delete_workspace(workspace_id: int) -> dict:
         Receive the id of the workspace.
         
     Returns:
-        A json with the workspace. HTTPStatus.OK if the workspace was found.
+        A json with a msg: string with the name and a message. HTTPStatus.OK if the workspace was deleted.
         
     Raises:
         HTTPStatus.NOT_FOUND: If the workspace is not found.

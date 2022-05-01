@@ -10,7 +10,24 @@ from app.models.tag_model import Tag, TagSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 
 
-def create_patient():
+def create_patient() -> dict:
+    """Create a new patient
+    
+    A controller to let the user create a new patient.
+    
+    Args:
+        Receive no args.
+        Get the name, gender, patient_code, profession, marital_status, responsible_guardian, 
+        responsible_contact, birth_date, workspace, address and tags from the request.
+    
+    Returns:
+        A json with the patient. HTTPStatus.CREATED if the patient was created.
+        
+    Raises:
+        Error: if the workspace was not found.
+        
+    """
+    
     session: Session = current_app.db.session
     data = request.json
 
@@ -114,7 +131,7 @@ def create_patient():
         "address": schemaAddress.dump(address),
         "allergies": AllergySchema(many=True).dump(list_allergies),
         "tags": TagSchema(many=True).dump(patient.tags),
-    }
+    }, HTTPStatus.CREATED
 
 
 def get_patients():
