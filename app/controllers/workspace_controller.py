@@ -147,7 +147,7 @@ def get_specific_workspace(id: int) -> dict:
                         "birth_date": patient.birth_date,
                         "workspace_id": patient.workspace_id,
                         "address": AddressSchema().dump(patient.address),
-                        "tags":TagSchema(many=True).dump(patient.tags),
+                        "tags":TagSchema(many=True, only=["tag_id","tag","alert_tag"]).dump(patient.tags),
                         "allergies": AllergySchema(many=True).dump(patient.allergies)
                         },
                 "datas": [{
@@ -157,6 +157,7 @@ def get_specific_workspace(id: int) -> dict:
                     "status": data.status,
                     "category_id": data.category_id,
                     "category_name": data.category.category,
+                    "tags": TagSchema(many=True, only=["tag_id","tag","alert_tag"]).dump(data.tags)
                 } for data in patient.datas],
                 "comments": CommentSchema(many=True).dump(patient.comments),
             }
