@@ -26,6 +26,8 @@ class Category(db.Model):
         uselist=True,
     )
 
+    datas = db.relationship("Data", back_populates="category", uselist=True)
+
 
 class CategorySchema(Schema):
     """Category model schema.
