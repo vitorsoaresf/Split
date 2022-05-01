@@ -36,8 +36,7 @@ class Patient(db.Model):
     patient_id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
     gender = Column(String, nullable=False)
-    hospitalization_date = Column(
-        DateTime, default=datetime.now().strftime("%d/%m/%Y"))
+    hospitalization_date = Column(DateTime, default=datetime.now().strftime("%d/%m/%Y"))
     cpf = Column(String, nullable=False)
     profession = Column(String)
     marital_status = Column(String)
@@ -55,10 +54,23 @@ class Patient(db.Model):
     allergies = relationship(
         "Allergy", secondary=patients_allergies, back_populates="patients"
     )
+
     workspace = relationship("Workspace", back_populates="patients")
 
     address = db.relationship(
-        "Address", back_populates="patient", uselist=False
+        "Address", cascade="all,delete", back_populates="patient", uselist=False
+    )
+
+    datas = db.relationship(
+        "Data", cascade="all,delete", back_populates="patient", uselist=True
+    )
+
+    comments = db.relationship(
+        "Comment", cascade="all,delete", back_populates="patient", uselist=True
+    )
+
+    tags = db.relationship(
+        "Tag", cascade="all,delete", back_populates="patient", uselist=True
     )
 
 

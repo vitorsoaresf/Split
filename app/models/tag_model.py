@@ -26,6 +26,10 @@ class Tag(db.Model):
     patient_id = Column(Integer, ForeignKey("patients.patient_id"))
     alert_tag = Column(Boolean)
 
+    data = db.relationship("Data", back_populates="tags", uselist=False)
+
+    patient = db.relationship("Patient", back_populates="tags", uselist=False)
+
 
 class TagSchema(Schema):
     """Tag model schema.
