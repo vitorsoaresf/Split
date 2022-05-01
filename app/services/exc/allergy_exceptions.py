@@ -1,0 +1,3 @@
+from .geral_exceptions import InvalidInput
+
+class InvalidAllergyName(InvalidInput):...
