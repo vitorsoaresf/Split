@@ -20,7 +20,7 @@ def create_patient():
     #Normalization
     data['name'] = data['name'].title()
     data['profession'] = data['profession'].title()
-    data['response_guardian'] = data['response_guardian'].title()
+    data['responsible_guardian'] = data['responsible_guardian'].title()
 
     workspace_id = data.pop("workspace_id")
     workspace = Workspace.query.get(workspace_id)
@@ -104,7 +104,7 @@ def create_patient():
         "_id": patient.patient_id,
         "name": patient.name,
         "gender": patient.gender,
-        "cpf": patient.cpf,
+        "patient_code": patient.patient_code,
         "profession": patient.profession,
         "marital_status": patient.marital_status,
         "responsible_guardian": patient.responsible_guardian,
@@ -128,7 +128,7 @@ def get_patients():
                     "_id": patient.patient_id,
                     "name": patient.name,
                     "gender": patient.gender,
-                    "cpf": patient.cpf,
+                    "patient_code": patient.patient_code,
                     "profession": patient.profession,
                     "marital_status": patient.marital_status,
                     "responsible_guardian": patient.responsible_guardian,
@@ -158,7 +158,7 @@ def get_patient_specific(id: int):
         "_id": patient.patient_id,
         "name": patient.name,
         "gender": patient.gender,
-        "cpf": patient.cpf,
+        "patient_code": patient.patient_code,
         "profession": patient.profession,
         "marital_status": patient.marital_status,
         "responsible_guardian": patient.responsible_guardian,
@@ -205,7 +205,7 @@ def update_patient(id: int):
         "_id": patient.patient_id,
         "name": patient.name,
         "gender": patient.gender,
-        "cpf": patient.cpf,
+        "patient_code": patient.patient_code,
         "profession": patient.profession,
         "marital_status": patient.marital_status,
         "responsible_guardian": patient.responsible_guardian,

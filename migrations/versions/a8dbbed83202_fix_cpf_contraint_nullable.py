@@ -1,8 +1,8 @@
-"""empty message
+"""fix cpf contraint nullable
 
-Revision ID: e7931649f97f
+Revision ID: a8dbbed83202
 Revises: 
-Create Date: 2022-04-29 09:54:17.243504
+Create Date: 2022-05-01 14:51:33.206357
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e7931649f97f'
+revision = 'a8dbbed83202'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -57,7 +57,7 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('gender', sa.String(), nullable=False),
     sa.Column('hospitalization_date', sa.DateTime(), nullable=True),
-    sa.Column('cpf', sa.String(), nullable=False),
+    sa.Column('patient_code', sa.String(), nullable=True),
     sa.Column('profession', sa.String(), nullable=True),
     sa.Column('marital_status', sa.String(), nullable=True),
     sa.Column('responsible_guardian', sa.String(), nullable=True),
@@ -86,6 +86,18 @@ def upgrade():
     sa.UniqueConstraint('cpf'),
     sa.UniqueConstraint('email'),
     sa.UniqueConstraint('profession_code')
+    )
+    op.create_table('comments',
+    sa.Column('comment_id', sa.Integer(), nullable=False),
+    sa.Column('comment', sa.Text(), nullable=False),
+    sa.Column('date_time', sa.DateTime(), nullable=True),
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('patient_id', sa.Integer(), nullable=False),
+    sa.Column('category_id', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['category_id'], ['categories.category_id'], ),
+    sa.ForeignKeyConstraint(['patient_id'], ['patients.patient_id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.user_id'], ),
+    sa.PrimaryKeyConstraint('comment_id')
     )
     op.create_table('datas',
     sa.Column('data_id', sa.Integer(), nullable=False),
@@ -133,6 +145,7 @@ def downgrade():
     op.drop_table('users_workspaces')
     op.drop_table('patients_allergies')
     op.drop_table('datas')
+    op.drop_table('comments')
     op.drop_table('users')
     op.drop_table('patients')
     op.drop_table('categories_workspaces')
