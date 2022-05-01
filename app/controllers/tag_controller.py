@@ -6,7 +6,23 @@ from sqlalchemy.orm import Session
 from app.models.patient_model import Patient
 
 
-def create_tag():
+def create_tag() -> dict:
+    """Create new Tags.
+    
+    A controller to let the user create tags for patients or data.
+    
+    Args:
+        Receive no args.
+        
+    Returns:
+        A json with the new tag. HTTPStatus.CREATED if the tag was created.
+        
+    Raises:
+        HTTPStatus.BAD_REQUEST: If the patient is not found.
+        HTTPStatus.BAD_REQUEST: If the data is not found.
+    
+    """
+    
     session: Session = current_app.db.session
     data = request.json
 
@@ -38,7 +54,21 @@ def create_tag():
     return schema.dump(tag), HTTPStatus.CREATED
 
 
-def delete_tag(tag_id):
+def delete_tag(tag_id: int) -> str:
+    """Delete a tag.
+    
+    A controller to let the user delete a tag.
+    
+    Args:
+        tag_id: The id of the tag to be deleted.
+        
+    Returns:
+        A json with a msg: string with the name and a message. HTTPStatus.OK if the tag was deleted.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the tag is not found.
+    """
+    
     session: Session = current_app.db.session
     tag = Tag.query.get(tag_id)
 

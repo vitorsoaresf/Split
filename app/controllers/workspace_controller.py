@@ -6,14 +6,31 @@ from app.models.allergy_model import AllergySchema
 from app.models.category_model import Category, CategorySchema
 from app.models.comment_model import CommentSchema
 from app.models.data_model import DataSchema
-from app.models.patient_model import Patient, PatientSchema
+from app.models.patient_model import PatientSchema
+from app.models.tag_model import TagSchema
 from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
-from app.models.tag_model import TagSchema
 
-def create_workspace():
+
+def create_workspace() -> dict:
+    """Create new Workspaces.
+
+    A controller to let the user create workspaces.
+    
+    Args:
+        Receive no args.
+        Get the name, local, owner_id and categories from the request.
+            
+    Returns:
+        A json with the new workspace. HTTPStatus.CREATED if the workspace was created.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the workspace is not found.
+        
+    """
+    
     session: Session = current_app.db.session
     data = request.json
 
@@ -52,7 +69,22 @@ def create_workspace():
     }, HTTPStatus.CREATED
 
 
-def get_workspaces():
+def get_workspaces() -> dict:
+    """Get all Workspaces.
+    
+    A controller to get all workspaces.
+    
+    Args:
+        Receive no args.
+        
+    Returns:
+        A json with all workspaces. HTTPStatus.OK if workspaces were found.
+        
+    Raises:
+
+    
+    """
+    
     workspaces = Workspace.query.all()
 
     list_response = [
@@ -72,7 +104,22 @@ def get_workspaces():
     return jsonify(list_response), HTTPStatus.OK
 
 
-def get_specific_workspace(id: int):
+def get_specific_workspace(id: int) -> dict:
+    """Get a specific Workspace.
+    
+    A controller to get a specific workspace.
+    
+    Args:
+        Receive the id of the workspace.
+        
+    Returns:
+        A json with the workspace. HTTPStatus.OK if the workspace was found.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the workspace is not found.
+    
+    """
+    
     workspace = Workspace.query.get(id)
 
     if not workspace:
@@ -92,7 +139,7 @@ def get_specific_workspace(id: int):
                         "_id": patient.patient_id,
                         "name": patient.name,
                         "gender": patient.gender,
-                        "cpf": patient.cpf,
+                        "patient_code": patient.patient_code,
                         "profession": patient.profession,
                         "marital_status": patient.marital_status,
                         "responsible_guardian": patient.responsible_guardian,
@@ -100,18 +147,50 @@ def get_specific_workspace(id: int):
                         "birth_date": patient.birth_date,
                         "workspace_id": patient.workspace_id,
                         "address": AddressSchema().dump(patient.address),
-                        "tags":TagSchema(many=True).dump(patient.tags),
+                        "tags":TagSchema(many=True, only=["tag_id","tag","alert_tag"]).dump(patient.tags),
                         "allergies": AllergySchema(many=True).dump(patient.allergies)
                         },
-                "datas": DataSchema(many=True).dump(patient.datas),
-                "comments": CommentSchema(many=True).dump(patient.comments),
+                "datas": [ {
+                    "data_id": data.data_id,
+                    "description": data.description,
+                    "date": data.date,
+                    "status": data.status,
+                    "category_id": data.category_id,
+                    "category_name": data.category.category,
+                    "tags": TagSchema(many=True, only=["tag_id","tag","alert_tag"]).dump(data.tags),
+                    
+                } for data in patient.datas],
+                "comments": [
+                        {
+                            "comment_id": comment.comment_id,
+                            "comment": comment.comment,
+                            "user_name": comment.user.name,
+                            "date_time": comment.date_time,
+                            "category_name": comment.category.category
+                        } for comment in patient.comments 
+                    ]
             }
             for patient in workspace.patients
         ],
     }, HTTPStatus.OK
 
 
-def update_workspace(id: int):
+def update_workspace(id: int) -> dict:
+    """Update a specific Workspace.
+    
+    A controller to update a specific workspace.
+    
+    Args:
+        Receive the id of the workspace.
+        
+    Returns:
+        A json with the workspace. HTTPStatus.OK if the workspace was found.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the workspace is not found.
+    
+    """
+    
     session: Session = current_app.db.session
     schema = WorkspaceSchema()
     data = request.json
@@ -129,7 +208,21 @@ def update_workspace(id: int):
     return schema.dump(workspace), HTTPStatus.OK
 
 
-def delete_workspace(workspace_id: int):
+def delete_workspace(workspace_id: int) -> dict:
+    """Delete a specific Workspace.
+    
+    A controller to delete a specific workspace.
+    
+    Args:
+        Receive the id of the workspace.
+        
+    Returns:
+        A json with a msg: string with the name and a message. HTTPStatus.OK if the workspace was deleted.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the workspace is not found.
+    
+    """
     session: Session = current_app.db.session
 
     workspace = Workspace.query.get(workspace_id)
@@ -143,7 +236,23 @@ def delete_workspace(workspace_id: int):
     return {"msg": f"Workspace {workspace.name} deleted"}, HTTPStatus.OK
 
 
-def add_user_to_workspace(workspace_id: int):
+def add_user_to_workspace(workspace_id: int) -> dict:
+    """Add a user to a specific Workspace.
+    
+    A controller to add a user to a specific workspace.
+    
+    Args:
+        Receive the id of the workspace.
+        
+    Returns:
+        A json with the workspace. HTTPStatus.OK if the workspace was found.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the user is not found.
+        HTTPStatus.NOT_FOUND: If the workspace is not found.
+    
+    """
+    
     session: Session = current_app.db.session
     data = request.json
 
@@ -170,7 +279,22 @@ def add_user_to_workspace(workspace_id: int):
     }, HTTPStatus.OK
 
 
-def get_workspace_patients_categories(workspace_id: int):
+def get_workspace_patients_categories(workspace_id: int) -> dict:
+    """Get all patients and categories of a specific Workspace.
+    
+    A controller to get all patients and categories of a specific workspace.
+    
+    Args:
+        Receive the id of the workspace.
+        
+    Returns:
+        A json with the workspace. HTTPStatus.OK if the workspace was found.
+        
+    Raises:
+        HTTPStatus.NOT_FOUND: If the workspace is not found.
+    
+    """
+    
     workspace = Workspace.query.get(workspace_id)
 
     if not workspace:

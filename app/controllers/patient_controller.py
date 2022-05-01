@@ -10,7 +10,24 @@ from app.models.tag_model import Tag, TagSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 
 
-def create_patient():
+def create_patient() -> dict:
+    """Create a new patient
+    
+    A controller to let the user create a new patient.
+    
+    Args:
+        Receive no args.
+        Get the name, gender, patient_code, profession, marital_status, responsible_guardian, 
+        responsible_contact, birth_date, workspace, address and tags from the request.
+    
+    Returns:
+        A json with the patient. HTTPStatus.CREATED if the patient was created.
+        
+    Raises:
+        Error: if the workspace was not found.
+        
+    """
+    
     session: Session = current_app.db.session
     data = request.json
 
@@ -20,7 +37,7 @@ def create_patient():
     #Normalization
     data['name'] = data['name'].title()
     data['profession'] = data['profession'].title()
-    data['response_guardian'] = data['response_guardian'].title()
+    data['responsible_guardian'] = data['responsible_guardian'].title()
 
     workspace_id = data.pop("workspace_id")
     workspace = Workspace.query.get(workspace_id)
@@ -104,7 +121,7 @@ def create_patient():
         "_id": patient.patient_id,
         "name": patient.name,
         "gender": patient.gender,
-        "cpf": patient.cpf,
+        "patient_code": patient.patient_code,
         "profession": patient.profession,
         "marital_status": patient.marital_status,
         "responsible_guardian": patient.responsible_guardian,
@@ -114,7 +131,7 @@ def create_patient():
         "address": schemaAddress.dump(address),
         "allergies": AllergySchema(many=True).dump(list_allergies),
         "tags": TagSchema(many=True).dump(patient.tags),
-    }
+    }, HTTPStatus.CREATED
 
 
 def get_patients():
@@ -128,7 +145,7 @@ def get_patients():
                     "_id": patient.patient_id,
                     "name": patient.name,
                     "gender": patient.gender,
-                    "cpf": patient.cpf,
+                    "patient_code": patient.patient_code,
                     "profession": patient.profession,
                     "marital_status": patient.marital_status,
                     "responsible_guardian": patient.responsible_guardian,
@@ -166,7 +183,7 @@ def get_patient_specific(id: int):
         "_id": patient.patient_id,
         "name": patient.name,
         "gender": patient.gender,
-        "cpf": patient.cpf,
+        "patient_code": patient.patient_code,
         "profession": patient.profession,
         "marital_status": patient.marital_status,
         "responsible_guardian": patient.responsible_guardian,
@@ -214,7 +231,7 @@ def update_patient(id: int):
         "_id": patient.patient_id,
         "name": patient.name,
         "gender": patient.gender,
-        "cpf": patient.cpf,
+        "patient_code": patient.patient_code,
         "profession": patient.profession,
         "marital_status": patient.marital_status,
         "responsible_guardian": patient.responsible_guardian,
