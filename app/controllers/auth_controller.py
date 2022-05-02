@@ -23,26 +23,20 @@ def login():
         HTTPStatus.UNAUTHORIZED: If the user is not found.
     """
 
+    session : Session = db.session
     data: dict = request.get_json()
 
-    session : Session = db.session
-
     try:
-
         user_email = data.pop("email")
-
         user_password = data.pop("password")
-
         user : User = session.query(User).filter_by(email = user_email).first()
 
         if not check_password_hash(user.password_hash, user_password): 
-
             raise ValueError
         
         return {"token": "abacaxi"}, HTTPStatus.OK
     
     except:
-
         return {"error": "Unauthorized"}, HTTPStatus.UNAUTHORIZED
 
 

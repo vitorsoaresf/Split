@@ -3,6 +3,7 @@ from http import HTTPStatus
 from app.models.data_model import Data
 from app.models.patient_model import Patient
 from app.models.tag_model import Tag, TagSchema
+from app.services.exc.tag_exceptions import InvalidTag
 from flask import current_app, request
 from sqlalchemy.orm import Session
 
@@ -42,17 +43,20 @@ def create_tag() -> dict:
         if not get_data:
             return {"error": "Data not Found"}, HTTPStatus.BAD_REQUEST
 
-    schema = TagSchema()
-    schema.load(data)
+    try:
+        schema = TagSchema()
+        schema.load(data)
 
-    #Normalization
-    data['tag'] = data['tag'].casefold()
+        #Normalization
+        data['tag'] = data['tag'].casefold()
 
-    tag = Tag(**data)
+        tag = Tag(**data)
 
-    session.add(tag)
-    session.commit()
-
+        session.add(tag)
+        session.commit()
+    except InvalidTag:
+        return {"error": "Invalid Tag"}, HTTPStatus.BAD_REQUEST
+        
     return schema.dump(tag), HTTPStatus.CREATED
 
 
