@@ -1,9 +1,10 @@
 from http import HTTPStatus
-from flask import current_app, request
+
 from app.models.data_model import Data
-from app.models.tag_model import Tag, TagSchema
-from sqlalchemy.orm import Session
 from app.models.patient_model import Patient
+from app.models.tag_model import Tag, TagSchema
+from flask import current_app, request
+from sqlalchemy.orm import Session
 
 
 def create_tag() -> dict:
@@ -13,6 +14,7 @@ def create_tag() -> dict:
     
     Args:
         Receive no args.
+        Get the name from request.
         
     Returns:
         A json with the new tag. HTTPStatus.CREATED if the tag was created.

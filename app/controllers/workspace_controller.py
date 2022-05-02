@@ -21,7 +21,7 @@ def create_workspace() -> dict:
     
     Args:
         Receive no args.
-        Get the name, local, owner_id and categories from the request.
+        Get the name, local, owner_id and categories from request.
             
     Returns:
         A json with the new workspace. HTTPStatus.CREATED if the workspace was created.

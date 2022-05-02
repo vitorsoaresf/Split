@@ -1,12 +1,11 @@
+from datetime import datetime
 from http import HTTPStatus
 
 from app.models import Data, DataSchema
+from app.models.patient_model import PatientSchema
+from app.models.tag_model import Tag, TagSchema
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
-from datetime import datetime
-from app.models.patient_model import PatientSchema
-
-from app.models.tag_model import Tag, TagSchema
 
 
 def create_data() -> dict:
@@ -15,7 +14,9 @@ def create_data() -> dict:
     This controller will create a new data.
 
     Args:
-        no args.
+        Receive no args.
+        Get description, patient_id and user_id from request.
+        Set status and date.
 
     Returns:
         A dict with the data created.
@@ -81,6 +82,7 @@ def get_data() -> dict:
     Raises:
         No content: If there are no data.
     """
+    
     schema = DataSchema(many=True)
 
     list_data = Data.query.all()
@@ -117,6 +119,7 @@ def get_data_specific(data_id: int) -> dict:
     Raises:
         Not found: If the data is not found.
     """
+    
     schema = DataSchema()
 
     data = Data.query.get(data_id)
@@ -176,11 +179,12 @@ def delete_data(data_id: int) -> dict:
         Id: The id of the data.
 
     Returns:
-        A dict with the data deleted.
+        A message with the data deleted.
 
     Raises:
         Not found: If the data is not found.
     """
+    
     session: Session = current_app.db.session
 
     data = Data.query.get(data_id)
