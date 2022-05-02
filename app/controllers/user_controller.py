@@ -5,7 +5,7 @@ from app.models.workspace_model import WorkspaceSchema
 from sqlalchemy.orm import Session
 from app.models import Address, AddressSchema
 from werkzeug.security import generate_password_hash
-from app.services.adress_service import svc_update_address, svc_create_address
+from app.services.address_service import svc_update_address, svc_create_address
 
 def create_user() -> dict:
     """Create new Users.
