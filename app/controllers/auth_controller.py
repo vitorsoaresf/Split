@@ -1,13 +1,27 @@
 from http import HTTPStatus
+
+from app.configs.database import db
+from app.models.user_model import User
 from flask import request
 from sqlalchemy.orm import Session
-from app.configs.database import db
 from werkzeug.security import check_password_hash
-
-from app.models.user_model import User
 
 
 def login():
+    """Login a user.
+    
+    A controller to login a user and return a JWT token.
+    
+    Args:
+        Receive no args.
+        Get the email and password from request.
+        
+    Returns:
+        A json with the user and the JWT token. HTTPStatus.OK if the user was logged in.
+        
+    Raises:
+        HTTPStatus.UNAUTHORIZED: If the user is not found.
+    """
 
     data: dict = request.get_json()
 
