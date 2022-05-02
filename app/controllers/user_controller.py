@@ -1,11 +1,13 @@
 from http import HTTPStatus
-from flask import jsonify, request, current_app
+
+from app.models import Address, AddressSchema
 from app.models.user_model import User, UserSchema
 from app.models.workspace_model import WorkspaceSchema
+from app.services.address_service import svc_create_address, svc_update_address
+from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
-from app.models import Address, AddressSchema
 from werkzeug.security import generate_password_hash
-from app.services.adress_service import svc_update_address, svc_create_address
+
 
 def create_user() -> dict:
     """Create new Users.
@@ -14,7 +16,7 @@ def create_user() -> dict:
     
     Args:
         Receive no args.
-        Get the name, profession, cpf, phone, email, profession_code, password and address from the request.
+        Get the name, profession, cpf, phone, email, profession_code, password and address from request.
         
     Returns:
         A json with the new user. HTTPStatus.CREATED if the user was created.
@@ -162,24 +164,27 @@ def update_user(id: int) -> dict:
 
     user = User.query.get(id)
 
+    if not user:
+        return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
+    
     if 'address' in data.keys():
         new_address = data.pop('address')
         address_id = user.address_id
         svc_update_address(address_id, new_address)
+        
+    try:    
+        for key, value in data.items():
+            if key == "password":
+                value_hash = generate_password_hash(value)
+                setattr(user,key, value_hash)
+            else:
+                setattr(user, key, value)
 
-    if not user:
-        return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
-    
-    for key, value in data.items():
-
-        if key == "password":
-            value_hash = generate_password_hash(value)
-            setattr(user,key, value_hash)
-        else:
-            setattr(user, key, value)
-
-    session.commit()
-
+        session.commit()
+        
+    except:
+        return {"msg": "Error updating user"}, HTTPStatus.BAD_REQUEST
+        
     return UserSchema(exclude=["password_hash"]).dump(user), HTTPStatus.OK
 
 

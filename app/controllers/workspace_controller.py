@@ -4,12 +4,11 @@ from app.models import User
 from app.models.address_model import AddressSchema
 from app.models.allergy_model import AllergySchema
 from app.models.category_model import Category, CategorySchema
-from app.models.comment_model import CommentSchema
-from app.models.data_model import DataSchema
 from app.models.patient_model import PatientSchema
 from app.models.tag_model import TagSchema
 from app.models.user_model import UserSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
+from app.services.exc import InvalidName
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
 
@@ -21,7 +20,7 @@ def create_workspace() -> dict:
     
     Args:
         Receive no args.
-        Get the name, local, owner_id and categories from the request.
+        Get the name, local, owner_id and categories from request.
             
     Returns:
         A json with the new workspace. HTTPStatus.CREATED if the workspace was created.
@@ -38,28 +37,31 @@ def create_workspace() -> dict:
     if not user:
         return {"error": "User-owner not Found"}, HTTPStatus.BAD_REQUEST
 
-    categories = data.pop("categories")
+    try:
+        categories = data.pop("categories")
 
-    list_categories = []
-    for category in categories:
-        ct = Category.query.filter_by(category=category).first()
-        list_categories.append(ct)
+        list_categories = []
+        for category in categories:
+            ct = Category.query.filter_by(category=category).first()
+            list_categories.append(ct)
 
 
-    schema = WorkspaceSchema()
-    schema.load(data)
+        schema = WorkspaceSchema()
+        schema.load(data)
 
-    data['name'].upper()
-    data['local'].upper()
+        data['name'].upper()
+        data['local'].upper()
 
-    workspace = Workspace(**data)
-    workspace.users.append(user)
+        workspace = Workspace(**data)
+        workspace.users.append(user)
 
-    workspace.categories.extend(list_categories)
+        workspace.categories.extend(list_categories)
 
-    session.add(workspace)
-    session.commit()
-
+        session.add(workspace)
+        session.commit()
+    except:
+        raise HTTPStatus.BAD_REQUEST
+        
     return {
         "name": workspace.name,
         "owner_id": workspace.owner_id,
@@ -196,15 +198,19 @@ def update_workspace(id: int) -> dict:
     data = request.json
 
     workspace = Workspace.query.get(id)
+    
+    try:
+        if not workspace:
+            return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
 
-    if not workspace:
-        return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
+        for key, value in data.items():
+            setattr(workspace, key, value)
 
-    for key, value in data.items():
-        setattr(workspace, key, value)
-
-    session.commit()
-
+        session.commit()
+        
+    except:
+        raise InvalidName("Invalid Name")
+        
     return schema.dump(workspace), HTTPStatus.OK
 
 
