@@ -23,7 +23,6 @@ def login():
 
         user: User = session.query(User).filter_by(email=user_email).first()
 
-        print(">>>", user)
         if not user:
             raise ValueError
 

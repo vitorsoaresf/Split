@@ -8,36 +8,38 @@ from app.models.data_model import DataSchema
 from app.models.patient_model import Patient, PatientSchema
 from app.models.tag_model import Tag, TagSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
+from flask_jwt_extended import jwt_required
 
 
+@jwt_required()
 def create_patient() -> dict:
     """Create a new patient
-    
+
     A controller to let the user create a new patient.
-    
+
     Args:
         Receive no args.
-        Get the name, gender, patient_code, profession, marital_status, responsible_guardian, 
+        Get the name, gender, patient_code, profession, marital_status, responsible_guardian,
         responsible_contact, birth_date, workspace, address and tags from the request.
-    
+
     Returns:
         A json with the patient. HTTPStatus.CREATED if the patient was created.
-        
+
     Raises:
         Error: if the workspace was not found.
-        
+
     """
-    
+
     session: Session = current_app.db.session
     data = request.json
 
     tags = data.pop("tags", [])
     alerts = data.pop("alerts", [])
 
-    #Normalization
-    data['name'] = data['name'].title()
-    data['profession'] = data['profession'].title()
-    data['responsible_guardian'] = data['responsible_guardian'].title()
+    # Normalization
+    data["name"] = data["name"].title()
+    data["profession"] = data["profession"].title()
+    data["responsible_guardian"] = data["responsible_guardian"].title()
 
     workspace_id = data.pop("workspace_id")
     workspace = Workspace.query.get(workspace_id)
@@ -56,8 +58,8 @@ def create_patient() -> dict:
 
     list_allergies = []
     for allergy in allergies:
-        
-        #Normalization
+
+        # Normalization
         allergy = allergy.casefold()
 
         al = Allergy.query.filter_by(name=allergy).first()
@@ -188,6 +190,8 @@ def get_patient_specific(id: int):
     }, HTTPStatus.OK
 
 
+# acho que aqui só com o root
+@jwt_required()
 def delete_patient(id: int):
     session: Session = current_app.db.session
     patient = Patient.query.get(id)
@@ -203,6 +207,7 @@ def delete_patient(id: int):
     return "", HTTPStatus.NO_CONTENT
 
 
+@jwt_required()
 def update_patient(id: int):
     session: Session = current_app.db.session
     schema = PatientSchema()

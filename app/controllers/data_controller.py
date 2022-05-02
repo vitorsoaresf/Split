@@ -5,10 +5,11 @@ from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
 from datetime import datetime
 from app.models.patient_model import PatientSchema
-
 from app.models.tag_model import Tag, TagSchema
+from flask_jwt_extended import jwt_required
 
 
+@jwt_required()
 def create_data() -> dict:
     """Create a new data.
 
@@ -135,6 +136,7 @@ def get_data_specific(data_id: int) -> dict:
     }, HTTPStatus.OK
 
 
+@jwt_required()
 def update_data(data_id: int) -> dict:
     """Update a specific data.
 
