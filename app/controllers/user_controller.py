@@ -7,6 +7,7 @@ from app.services.adress_service import svc_create_address, svc_update_address
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
+from app.services.address_service import svc_update_address, svc_create_address
 
 
 def create_user() -> dict:
