@@ -1,6 +1,5 @@
 from http import HTTPStatus
-from flask import request, current_app, jsonify
-from sqlalchemy.orm import Session
+
 from app.models.address_model import Address, AddressSchema
 from app.models.allergy_model import Allergy, AllergySchema
 from app.models.comment_model import CommentSchema
@@ -8,6 +7,8 @@ from app.models.data_model import DataSchema
 from app.models.patient_model import Patient, PatientSchema
 from app.models.tag_model import Tag, TagSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
+from flask import current_app, jsonify, request
+from sqlalchemy.orm import Session
 
 
 def create_patient() -> dict:
@@ -18,7 +19,7 @@ def create_patient() -> dict:
     Args:
         Receive no args.
         Get the name, gender, patient_code, profession, marital_status, responsible_guardian, 
-        responsible_contact, birth_date, workspace, address and tags from the request.
+        responsible_contact, birth_date, workspace, address and tags from request.
     
     Returns:
         A json with the patient. HTTPStatus.CREATED if the patient was created.
