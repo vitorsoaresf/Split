@@ -1,15 +1,14 @@
 from http import HTTPStatus
 
 from app.models.address_model import Address, AddressSchema
-from app.models.allergy_model import Allergy, AllergySchema
-from app.models.comment_model import CommentSchema
-from app.models.data_model import DataSchema
+from app.models.allergy_model import AllergySchema
 from app.models.patient_model import Patient, PatientSchema
-from app.models.tag_model import Tag, TagSchema
+from app.models.tag_model import TagSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 from app.services.address_service import svc_create_address, svc_update_address
 from app.services.allergy_service import svc_create_allergy, svc_update_allergy
-from app.services.tag_service import svc_create_tag, svc_create_alert_tag, svc_update_delete_tag
+from app.services.tag_service import (svc_create_alert_tag, svc_create_tag,
+                                      svc_update_delete_tag)
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
 
@@ -48,28 +47,32 @@ def create_patient() -> dict:
     if not workspace:
         # raise Exception
         return {"error": "Workspace not found"}
+    
+    try:
+        patient_address = data.pop("address", {})
+        address = svc_create_address(patient_address, session)
+    
+        data["address_id"] = address.address_id
 
-    patient_address = data.pop("address", {})
-    address = svc_create_address(patient_address, session)
-   
-    data["address_id"] = address.address_id
+        allergies = data.pop("allergies", [])
+        list_allergies = svc_create_allergy(allergies, session)
 
-    allergies = data.pop("allergies", [])
-    list_allergies = svc_create_allergy(allergies, session)
+        data["workspace_id"] = workspace_id
 
-    data["workspace_id"] = workspace_id
+        PatientSchema().load(data)
+        patient = Patient(**data)
 
-    PatientSchema().load(data)
-    patient = Patient(**data)
+        patient.allergies.extend(list_allergies)
 
-    patient.allergies.extend(list_allergies)
+        session.add(patient)
+        session.commit()
 
-    session.add(patient)
-    session.commit()
+        svc_create_tag(tags, patient, session)
+        svc_create_alert_tag(alerts, patient, session)
+        session.commit()
 
-    svc_create_tag(tags, patient, session)
-    svc_create_alert_tag(alerts, patient, session)
-    session.commit()
+    except:
+        return {"error": "Error creating patient"}, HTTPStatus.BAD_REQUEST
 
     return {
             "_id": patient.patient_id,
@@ -165,19 +168,24 @@ def update_patient(id: int):
     if not patient:
         return {"msg": "Patient not Found"}, HTTPStatus.NOT_FOUND
 
-    address = data.pop("address", {})
-    address_id = patient.address_id
-    svc_update_address(address_id, address, session)
-    tags = data.pop("tags", [])
-    alerts = data.pop("alert", [])
-    svc_update_delete_tag(tags, alerts, patient, session)
-    allergies = data.pop("allergies", [])
-    svc_update_allergy(patient, allergies, session)
 
-    for key, value in data.items():
-        setattr(patient, key, value)
+    try:
+        address = data.pop("address", {})
+        address_id = patient.address_id
+        svc_update_address(address_id, address, session)
+        tags = data.pop("tags", [])
+        alerts = data.pop("alert", [])
+        svc_update_delete_tag(tags, alerts, patient, session)
+        allergies = data.pop("allergies", [])
+        svc_update_allergy(patient, allergies, session)
 
-    session.commit()
+        for key, value in data.items():
+            setattr(patient, key, value)
+
+        session.commit()
+
+    except:
+        return {"error": "Error updating patient"}, HTTPStatus.BAD_REQUEST
 
     return {
             "_id": patient.patient_id,

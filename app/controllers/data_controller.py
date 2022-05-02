@@ -3,7 +3,7 @@ from http import HTTPStatus
 
 from app.models import Data, DataSchema
 from app.models.patient_model import PatientSchema
-from app.models.tag_model import Tag, TagSchema
+from app.models.tag_model import TagSchema
 from app.services.tag_service import svc_create_alert_tag, svc_create_tag
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
@@ -43,12 +43,12 @@ def create_data() -> dict:
         session.commit()
 
         svc_create_tag(tags, new_data, session)
-        svc_create_alert_tag(tags, new_data, session)     
+        svc_create_alert_tag(alerts, new_data, session)     
         session.commit()
         return schema.dump(new_data), HTTPStatus.CREATED
 
     except:
-        return {"error": "Invalid request"}, HTTPStatus.BAD_REQUEST
+        return {"error": "Error creating data for patient"}, HTTPStatus.BAD_REQUEST
 
 
 def get_data() -> dict:
@@ -66,8 +66,6 @@ def get_data() -> dict:
         No content: If there are no data.
     """
     
-    schema = DataSchema(many=True)
-
     list_data = Data.query.all()
 
     return (
@@ -103,10 +101,7 @@ def get_data_specific(data_id: int) -> dict:
         Not found: If the data is not found.
     """
     
-    schema = DataSchema()
-
     data = Data.query.get(data_id)
-    print(">>>>>", data)
 
     if not data:
         return {"msg": "Data not Found"}, HTTPStatus.NOT_FOUND
@@ -135,10 +130,10 @@ def update_data(data_id: int) -> dict:
     Raises:
         Not found: If the data is not found.
     """
+    
     session: Session = current_app.db.session
     data_req = request.json
-    schema = DataSchema()
-    schema.load(data)
+    
     tags = data.pop("tags", [])
     alerts = data.pop("alerts", [])
     data = Data.query.get(data_id)
@@ -146,15 +141,19 @@ def update_data(data_id: int) -> dict:
     if not data:
         return {"msg": "Data not Found"}, HTTPStatus.NOT_FOUND
     
-    svc_create_tag(tags, data, session)
-    svc_create_alert_tag(alerts, data, session)
+    try:
+        svc_create_tag(tags, data, session)
+        svc_create_alert_tag(alerts, data, session)
 
-    for key, value in data_req.items():
-        setattr(data, key, value)
+        for key, value in data_req.items():
+            setattr(data, key, value)
 
-    session.commit()
+        session.commit()
 
-    return schema.dump(data), HTTPStatus.OK
+    except:
+        return {"error": "Error updating data"}, HTTPStatus.BAD_REQUEST
+
+    return DataSchema().dump(data), HTTPStatus.OK
 
 
 def delete_data(data_id: int) -> dict:
