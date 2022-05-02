@@ -95,6 +95,7 @@ def create_patient() -> dict:
     session.add(patient)
     session.commit()
 
+
     for tag in tags:
         obj = {
             "tag": tag,
@@ -115,7 +116,7 @@ def create_patient() -> dict:
         session.add(new_tag)
         patient.tags.append(new_tag)
 
-        session.commit()
+    session.commit()
 
     return {
         "_id": patient.patient_id,
