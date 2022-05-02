@@ -4,6 +4,7 @@ from http import HTTPStatus
 from app.models import Data, DataSchema
 from app.models.patient_model import PatientSchema
 from app.models.tag_model import Tag, TagSchema
+from app.services.tag_service import svc_create_alert_tag, svc_create_tag
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
 
@@ -41,26 +42,8 @@ def create_data() -> dict:
         session.add(new_data)
         session.commit()
 
-        for tag in tags:
-            obj = {
-                "tag": tag,
-                "data_id": new_data.data_id,
-                "alert_tag": False,
-            }
-            new_tag = Tag(**obj)
-            session.add(new_tag)
-            new_data.tags.append(new_tag)
-
-        for alert in alerts:
-            obj = {
-                "tag": alert,
-                "data_id": new_data.data_id,
-                "alert_tag": True,
-            }
-            new_tag = Tag(**obj)
-            session.add(new_tag)
-            new_data.tags.append(new_tag)
-
+        svc_create_tag(tags, new_data, session)
+        svc_create_alert_tag(tags, new_data, session)     
         session.commit()
         return schema.dump(new_data), HTTPStatus.CREATED
 
@@ -134,7 +117,7 @@ def get_data_specific(data_id: int) -> dict:
         "description": data.description,
         "date": data.date,
         "patient": PatientSchema().dump(data.patient),
-        "tags": TagSchema(many=True).dump(data.tags),
+        "tags": TagSchema(many=True, only=["tag", "alert"]).dump(data.tags),
     }, HTTPStatus.OK
 
 
@@ -155,12 +138,16 @@ def update_data(data_id: int) -> dict:
     session: Session = current_app.db.session
     data_req = request.json
     schema = DataSchema()
-
-    # schema.load(data)
+    schema.load(data)
+    tags = data.pop("tags", [])
+    alerts = data.pop("alerts", [])
     data = Data.query.get(data_id)
 
     if not data:
         return {"msg": "Data not Found"}, HTTPStatus.NOT_FOUND
+    
+    svc_create_tag(tags, data, session)
+    svc_create_alert_tag(alerts, data, session)
 
     for key, value in data_req.items():
         setattr(data, key, value)
