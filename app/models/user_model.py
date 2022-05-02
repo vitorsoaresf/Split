@@ -2,7 +2,14 @@ from app.configs.database import db
 from marshmallow import Schema, fields, validates
 from sqlalchemy import Column, ForeignKey, Integer, String
 import re
-from app.services.exc import InvalidCPF, InvalidCPFFormat, InvalidPhone, InvalidPhoneFormat, InvalidEmail
+from werkzeug.security import generate_password_hash, check_password_hash
+from app.services.exc import (
+    InvalidCPF,
+    InvalidCPFFormat,
+    InvalidPhone,
+    InvalidPhoneFormat,
+    InvalidEmail,
+)
 
 from .users_workspaces_table import users_workspaces
 
@@ -51,6 +58,17 @@ class User(db.Model):
 
     comments = db.relationship("Comment", back_populates="user", uselist=True)
 
+    @property
+    def password(self):
+        raise AttributeError("Password cannot be accessed!")
+
+    @password.setter
+    def password(self, password_to_hash):
+        self.password_hash = generate_password_hash(password_to_hash)
+
+    def verify_password(self, password_to_compare):
+        return check_password_hash(self.password_hash, password_to_compare)
+
 
 class UserSchema(Schema):
     """User schema.
@@ -77,7 +95,6 @@ class UserSchema(Schema):
     profession = fields.String()
     password_hash = fields.String()
 
-
     @validates("cpf")
     def validate_cpf(self, value):
         """Validate cpf.
@@ -103,8 +120,7 @@ class UserSchema(Schema):
             raise InvalidCPFFormat("Invalid CPF")
 
         return value
-    
-    
+
     @validates("phone")
     def validate_phone(self, value):
         """Validate phone.
@@ -130,8 +146,7 @@ class UserSchema(Schema):
             raise InvalidPhoneFormat("Invalid Phone format")
 
         return value
-    
-    
+
     @validates("email")
     def validate_email(self, value):
         """Validate email.
