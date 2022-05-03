@@ -6,7 +6,7 @@ from app.services.address_service import svc_create_address, svc_update_address
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 
 
 def create_user() -> dict:
@@ -111,6 +111,7 @@ def get_users() -> dict:
     return jsonify(list_users), HTTPStatus.OK
 
 
+@jwt_required()
 def get_user_specific(id: int) -> dict:
     """Get a specific user.
 
@@ -150,6 +151,7 @@ def get_user_specific(id: int) -> dict:
     }, HTTPStatus.OK
 
 
+@jwt_required()
 def update_user(id: int) -> dict:
     """Update a specific user.
 
@@ -195,6 +197,7 @@ def update_user(id: int) -> dict:
     return UserSchema(exclude=["password_hash"]).dump(user), HTTPStatus.OK
 
 
+@jwt_required()
 def delete_user(id: int) -> str:
     """Delete a specific user.
 
@@ -210,7 +213,9 @@ def delete_user(id: int) -> str:
         HTTPStatus.NOT_FOUND: If the user was not found.
 
     """
+    # credentials_user = get_jwt_identity()
 
+    # print(">>>> ", credentials_user)
     session: Session = current_app.db.session
 
     user = User.query.get(id)
@@ -222,3 +227,30 @@ def delete_user(id: int) -> str:
     session.commit()
 
     return {"msg": f"User {user.name} deleted"}, HTTPStatus.OK
+
+
+def login():
+
+    data: dict = request.get_json()
+
+    session: Session = current_app.db.session
+
+    try:
+
+        user_email = data.pop("email")
+
+        user_password = data.pop("password")
+
+        user: User = session.query(User).filter_by(email=user_email).first()
+
+        if not user:
+            raise ValueError
+
+        if not user.verify_password(user_password):
+            raise ValueError
+
+        access_token = create_access_token(identity=UserSchema().dump(user))
+        return {"access_token": access_token}, HTTPStatus.OK
+
+    except:
+        return {"error": "Unauthorized"}, HTTPStatus.UNAUTHORIZED
