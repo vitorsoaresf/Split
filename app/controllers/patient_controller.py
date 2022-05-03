@@ -7,51 +7,56 @@ from app.models.tag_model import TagSchema
 from app.models.workspace_model import Workspace, WorkspaceSchema
 from app.services.address_service import svc_create_address, svc_update_address
 from app.services.allergy_service import svc_create_allergy, svc_update_allergy
-from app.services.tag_service import (svc_create_alert_tag, svc_create_tag,
-                                      svc_update_delete_tag)
+from app.services.tag_service import (
+    svc_create_alert_tag,
+    svc_create_tag,
+    svc_update_delete_tag,
+)
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
+from flask_jwt_extended import jwt_required
 
 
+@jwt_required()
 def create_patient() -> dict:
     """Create a new patient
-    
+
     A controller to let the user create a new patient.
-    
+
     Args:
         Receive no args.
-        Get the name, gender, patient_code, profession, marital_status, responsible_guardian, 
+        Get the name, gender, patient_code, profession, marital_status, responsible_guardian,
         responsible_contact, birth_date, workspace, address and tags from request.
-    
+
     Returns:
         A json with the patient. HTTPStatus.CREATED if the patient was created.
-        
+
     Raises:
         Error: if the workspace was not found.
-        
+
     """
-    
+
     session: Session = current_app.db.session
     data = request.json
 
     tags = data.pop("tags", [])
     alerts = data.pop("alerts", [])
 
-    #Normalization
-    data['name'] = data['name'].title()
-    data['profession'] = data['profession'].title()
-    data['responsible_guardian'] = data['responsible_guardian'].title()
+    # Normalization
+    data["name"] = data["name"].title()
+    data["profession"] = data["profession"].title()
+    data["responsible_guardian"] = data["responsible_guardian"].title()
 
     workspace_id = data.pop("workspace_id")
     workspace = Workspace.query.get(workspace_id)
     if not workspace:
         # raise Exception
         return {"error": "Workspace not found"}
-    
+
     try:
         patient_address = data.pop("address", {})
         address = svc_create_address(patient_address, session)
-    
+
         data["address_id"] = address.address_id
 
         allergies = data.pop("allergies", [])
@@ -71,10 +76,8 @@ def create_patient() -> dict:
         svc_create_alert_tag(alerts, patient, session)
         session.commit()
 
-    except:
-        return {"error": "Error creating patient"}, HTTPStatus.BAD_REQUEST
 
-    return {
+        return {
             "_id": patient.patient_id,
             "name": patient.name,
             "gender": patient.gender,
@@ -87,8 +90,10 @@ def create_patient() -> dict:
             "workspace": WorkspaceSchema().dump(patient.workspace),
             "address": AddressSchema().dump(patient.address),
             "allergies": AllergySchema(many=True, only=["name"]).dump(patient.allergies),
-            "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags)
-    }, HTTPStatus.CREATED
+            "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags),
+        }, HTTPStatus.CREATED
+    except KeyError:
+        return {"error": "Error creating patient"}, HTTPStatus.BAD_REQUEST
 
 
 def get_patients():
@@ -110,8 +115,12 @@ def get_patients():
                     "birth_date": patient.birth_date,
                     "workspace": WorkspaceSchema().dump(patient.workspace),
                     "address": AddressSchema().dump(patient.address),
-                    "allergies": AllergySchema(many=True, only=["name"]).dump(patient.allergies),
-                    "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags)
+                    "allergies": AllergySchema(many=True, only=["name"]).dump(
+                        patient.allergies
+                    ),
+                    "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(
+                        patient.tags
+                    ),
                 }
                 for patient in patients
             ]
@@ -129,22 +138,23 @@ def get_patient_specific(id: int):
     address = Address.query.get(patient.address_id)
 
     return {
-            "_id": patient.patient_id,
-            "name": patient.name,
-            "gender": patient.gender,
-            "patient_code": patient.patient_code,
-            "profession": patient.profession,
-            "marital_status": patient.marital_status,
-            "responsible_guardian": patient.responsible_guardian,
-            "responsible_contact": patient.responsible_contact,
-            "birth_date": patient.birth_date,
-            "workspace": WorkspaceSchema().dump(patient.workspace),
-            "address": AddressSchema().dump(patient.address),
-            "allergies": AllergySchema(many=True, only=["name"]).dump(patient.allergies),
-            "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags)
+        "_id": patient.patient_id,
+        "name": patient.name,
+        "gender": patient.gender,
+        "patient_code": patient.patient_code,
+        "profession": patient.profession,
+        "marital_status": patient.marital_status,
+        "responsible_guardian": patient.responsible_guardian,
+        "responsible_contact": patient.responsible_contact,
+        "birth_date": patient.birth_date,
+        "workspace": WorkspaceSchema().dump(patient.workspace),
+        "address": AddressSchema().dump(patient.address),
+        "allergies": AllergySchema(many=True, only=["name"]).dump(patient.allergies),
+        "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags),
     }, HTTPStatus.OK
 
 
+@jwt_required()
 def delete_patient(id: int):
     session: Session = current_app.db.session
     patient = Patient.query.get(id)
@@ -160,6 +170,7 @@ def delete_patient(id: int):
     return "", HTTPStatus.NO_CONTENT
 
 
+@jwt_required()
 def update_patient(id: int):
     session: Session = current_app.db.session
     data = request.json
@@ -167,7 +178,6 @@ def update_patient(id: int):
     patient = Patient.query.get(id)
     if not patient:
         return {"msg": "Patient not Found"}, HTTPStatus.NOT_FOUND
-
 
     try:
         address = data.pop("address", {})
@@ -188,17 +198,17 @@ def update_patient(id: int):
         return {"error": "Error updating patient"}, HTTPStatus.BAD_REQUEST
 
     return {
-            "_id": patient.patient_id,
-            "name": patient.name,
-            "gender": patient.gender,
-            "patient_code": patient.patient_code,
-            "profession": patient.profession,
-            "marital_status": patient.marital_status,
-            "responsible_guardian": patient.responsible_guardian,
-            "responsible_contact": patient.responsible_contact,
-            "birth_date": patient.birth_date,
-            "workspace": WorkspaceSchema().dump(patient.workspace),
-            "address": AddressSchema().dump(patient.address),
-            "allergies": AllergySchema(many=True, only=["name"]).dump(patient.allergies),
-            "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags)
+        "_id": patient.patient_id,
+        "name": patient.name,
+        "gender": patient.gender,
+        "patient_code": patient.patient_code,
+        "profession": patient.profession,
+        "marital_status": patient.marital_status,
+        "responsible_guardian": patient.responsible_guardian,
+        "responsible_contact": patient.responsible_contact,
+        "birth_date": patient.birth_date,
+        "workspace": WorkspaceSchema().dump(patient.workspace),
+        "address": AddressSchema().dump(patient.address),
+        "allergies": AllergySchema(many=True, only=["name"]).dump(patient.allergies),
+        "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags),
     }, HTTPStatus.OK
