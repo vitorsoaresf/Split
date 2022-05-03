@@ -31,9 +31,7 @@ def create_user() -> dict:
 
     try:
         address = data.pop("address")
-        new_address = svc_create_address(address)
-        session.add(new_address)
-        session.commit()
+        new_address = svc_create_address(address, session)
 
         password = data.pop("password")
         password_hash = generate_password_hash(password)
@@ -165,7 +163,7 @@ def update_user(id: int) -> dict:
     if 'address' in data.keys():
         new_address = data.pop('address')
         address_id = user.address_id
-        svc_update_address(address_id, new_address)
+        svc_update_address(address_id, new_address, session)
 
     if not user:
         return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
