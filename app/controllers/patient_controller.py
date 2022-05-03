@@ -14,6 +14,7 @@ from app.services.tag_service import (
 )
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
+from flask_jwt_extended import jwt_required
 
 
 @jwt_required()

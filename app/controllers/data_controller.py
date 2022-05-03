@@ -7,6 +7,7 @@ from app.models.tag_model import TagSchema
 from app.services.tag_service import svc_create_alert_tag, svc_create_tag
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
+from flask_jwt_extended import jwt_required
 
 
 @jwt_required()
