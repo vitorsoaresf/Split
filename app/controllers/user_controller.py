@@ -3,7 +3,7 @@ from http import HTTPStatus
 from app.models import Address, AddressSchema
 from app.models.user_model import User, UserSchema
 from app.models.workspace_model import WorkspaceSchema
-from app.services.adress_service import svc_create_address, svc_update_address
+from app.services.address_service import svc_create_address, svc_update_address
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
