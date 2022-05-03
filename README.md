@@ -1,6 +1,8 @@
 # Split API
 
-SPLIT API for Kenzie Academy Brasil - app by Os Coringas da boa visão, escrita e corrida!
+SPLIT API for CAPSTONE Q3 Kenzie Academy Brasil - app by Os Coringas da boa visão, escrita e corrida!
+
+========== USER ==========
 
 ## Create USER
 
@@ -33,7 +35,7 @@ SPLIT API for Kenzie Academy Brasil - app by Os Coringas da boa visão, escrita 
 
 ## Get USERS
 
-`Get /users`
+`GET /users`
 
 ### Request
 
@@ -56,7 +58,7 @@ no request
 
 ## Get SPECIFIC USER
 
-`Get /users/<user_id>`
+`GET /users/<user_id>`
 
 ### Request
 
@@ -128,4 +130,484 @@ Arg: user_id
 
     {
         "msg": "User not Found"
+    }
+
+========== WORKSPACE ==========
+
+## Create WORKSPACES
+
+`POST /workspaces`
+
+### Request
+
+    {request example}
+
+### Response CREATED
+
+    {
+        "name": name,
+        "owner_id": owner_id,
+        "workspace_id": workspace_id,
+        "local": local,
+        "categories": categories
+    }
+
+### Response BAD_REQUEST
+
+    KeyError
+
+## Get WORKSPACES
+
+`GET /workspaces`
+
+### Request
+
+no request
+
+### Response OK
+
+    [
+        {
+            "name": name,
+            "owner_id": owner_id,
+            "workspace_id": workspace_id,
+            "local": local,
+            "categories": categories,
+            "workers": users
+        }
+    ]
+
+## Get SPECIFIC WORKSPACE
+
+`GET /workspaces/<workspace_id>`
+
+### Request
+
+Arg: workspace_id
+
+### Response OK
+
+    {
+        "name": name,
+        "owner_id": owner_id,
+        "workspace_id": workspace_id,
+        "local": local,
+        "categories": categories,
+        "workers": users,
+        "patients": [
+            {
+                "info": {
+                    "_id": patient_id,
+                    "name": name,
+                    "gender": gender,
+                    "patient_code": patient_code,
+                    "profession": profession,
+                    "marital_status": marital_status,
+                    "responsible_guardian": responsible_guardian,
+                    "responsible_contact": responsible_contact,
+                    "birth_date": birth_date,
+                    "workspace_id": workspace_id,
+                    "address": address,
+                    "tags": tags,
+                    "allergies": allergies,
+                },
+                "datas": [
+                    {
+                        "data_id": data_id,
+                        "description": description,
+                        "date": date,
+                        "status": status,
+                        "category_id": category_id,
+                        "category_name": category,
+                        "tags": tags,
+                    }
+                ],
+                "comments": [
+                    {
+                        "comment_id": comment_id,
+                        "comment": comment,
+                        "user_name": user.name,
+                        "date_time": date_time,
+                        "category_name": category,
+                    }
+                ],
+            }
+        ],
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Workspace not Found"
+    }
+
+## Update SPECIFIC WORKSPACE
+
+`PATCH /workspaces/<workspace_id>`
+
+### Request
+
+Arg: workspace_id
+
+### Response OK
+
+    {
+        "name": name,
+        "owner_id": owner_id,
+        "workspace_id": workspace_id,
+        "local": local,
+        "categories": categories,
+        "workers": users
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Workspace not Found"
+    }
+
+## Delete WORKSPACE
+
+`DELETE /workspaces/<workspace_id>`
+
+### Request
+
+Arg: workspace_id
+
+### Response OK
+
+    {
+        "msg": "Workspace name deleted"
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Workspace not Found"
+    }
+
+## Add USER to WORKSPACE
+
+`POST /workspaces/<workspace_id>`
+
+### Request
+
+Arg: workspace_id
+
+### Response OK
+
+    {
+        "name": name,
+        "owner_id": owner_id,
+        "workspace_id": workspace_id,
+        "local": local,
+        "categories": categories,
+        "workers": users
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Workspace not Found"
+    }
+
+## Add USER to WORKSPACE
+
+`GET /workspaces/<workspace_id>/patients`
+
+### Request
+
+Arg: workspace_id
+
+### Response OK
+
+    {
+        "workspace_id": workspace_id,
+        "name": name,
+        "local": local,
+        "owner_id": owner_id,
+        "patients": patients,
+        "categories": categories
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Workspace not Found"
+    }
+
+========== PATIENT ==========
+
+## Create PATIENT
+
+`POST /patients`
+
+### Request
+
+    {request example}
+
+### Response CREATED
+
+    {
+        "_id": patient_id,
+        "name": name,
+        "gender": gender,
+        "patient_code": patient_code,
+        "profession": profession,
+        "marital_status": marital_status,
+        "responsible_guardian": responsible_guardian,
+        "responsible_contact": responsible_contact,
+        "birth_date": birth_date,
+        "workspace": workspace,
+        "address": address,
+        "allergies": allergies,
+        "tags": tags
+    }
+
+### Response BAD_REQUEST
+
+    KeyError
+
+    {
+        "error": "Error creating patient"
+    }
+
+## Get PATIENTS
+
+`GET /patients`
+
+### Request
+
+no request
+
+### Response OK
+
+    [
+        {
+            "_id": patient_id,
+            "name": name,
+            "gender": gender,
+            "patient_code": patient_code,
+            "profession": profession,
+            "marital_status": marital_status,
+            "responsible_guardian": responsible_guardian,
+            "responsible_contact": responsible_contact,
+            "birth_date": birth_date,
+            "workspace": workspace,
+            "address": address,
+            "allergies": allergies,
+            "tags": tags
+        }
+    ]
+
+## Get SPECIFIC PATIENT
+
+`GET /patients/<patient_id>`
+
+### Request
+
+Arg: patient_id
+
+### Response OK
+
+    {
+        "_id": patient_id,
+        "name": name,
+        "gender": gender,
+        "patient_code": patient_code,
+        "profession": profession,
+        "marital_status": marital_status,
+        "responsible_guardian": responsible_guardian,
+        "responsible_contact": responsible_contact,
+        "birth_date": birth_date,
+        "workspace": workspace,
+        "address": address,
+        "allergies": allergies,
+        "tags": tags
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Patient not Found"
+    }
+
+## Update SPECIFIC USER
+
+`PATCH /patients/<patient_id>`
+
+### Request
+
+Arg: patient_id
+Request: any patient field.
+
+### Response OK
+
+    {
+        "_id": patient_id,
+        "name": name,
+        "gender": gender,
+        "patient_code": patient_code,
+        "profession": profession,
+        "marital_status": marital_status,
+        "responsible_guardian": responsible_guardian,
+        "responsible_contact": responsible_contact,
+        "birth_date": birth_date,
+        "workspace": workspace,
+        "address": address,
+        "allergies": allergies,
+        "tags": tags
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "UPatient not Found"
+    }
+
+### Response BAD_REQUEST
+
+    {
+        "error": "Error updating patient"
+    }
+
+## Delete USER
+
+`DELETE /patients/<patient_id>`
+
+### Request
+
+Arg: patient_id
+
+### Response NO_CONTENT
+
+### Response NOT_FOUND
+
+    {
+        "error": "Patient not Found"
+    }
+
+========== DATA ==========
+
+## Create DATA
+
+`POST /datas`
+
+### Request
+
+    {request example}
+
+### Response CREATED
+
+    {
+        "data_id": data_id
+        "status": Boolean
+        "description": description
+        "date": datetime
+        "patient_id": patient_id
+        "category_id": category_id
+    }
+
+### Response BAD_REQUEST
+
+    {
+        "error": "Error creating data for patient"
+    }
+
+## Get DATAS
+
+`GET /datas`
+
+### Request
+
+no request
+
+### Response OK
+
+    [
+        {
+            "data_id": data_id,
+            "status": status,
+            "description": description,
+            "date": date,
+            "patient": patient,
+            "tags": tags
+        }
+    ]
+
+## Get SPECIFIC DATA
+
+`GET /datas/<data_id>`
+
+### Request
+
+Arg: data_id
+
+### Response OK
+
+    {
+        "data_id": data_id,
+        "status": status,
+        "description": description,
+        "date": date,
+        "patient": patient,
+        "tags": tags
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Data not Found"
+    }
+
+## Update SPECIFIC DATA
+
+`PATCH /datas/<data_id>`
+
+### Request
+
+Arg: data_id
+Request: any data field.
+
+### Response OK
+
+    {
+        "data_id": data_id,
+        "status": status,
+        "description": description,
+        "date": date,
+        "patient": patient,
+        "tags": tags
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Data not Found"
+    }
+
+### Response BAD_REQUEST
+
+    {
+        "error": "Error updating data"
+    }
+
+## Delete DATA
+
+`DELETE /datas/<data_id>`
+
+### Request
+
+Arg: data_id
+
+### Response OK
+
+    {
+        "msg": "data description deleted"
+    }
+
+### Response NOT_FOUND
+
+    {
+        "msg": "Data not Found"
     }

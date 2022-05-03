@@ -161,12 +161,11 @@ def delete_patient(id: int):
 
     if not patient:
         # raise Exception
-        return {"error": "Patient not Found"}
+        return {"error": "Patient not Found"}, HTTPStatus.NOT_FOUND
 
     session.delete(patient)
     session.commit()
 
-    schema = PatientSchema()
     return "", HTTPStatus.NO_CONTENT
 
 
