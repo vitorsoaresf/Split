@@ -116,8 +116,8 @@ class UserSchema(Schema):
         if not value.isdigit() or len(value) != 11:
             raise InvalidCPF("Invalid CPF")
 
-        if not re.match(r"(^\d{3}\.\d{3}\.\d{3}\-\d{2}$)", value):
-            raise InvalidCPFFormat("Invalid CPF")
+        # if not re.match(r"(^\d{3}\.\d{3}\.\d{3}\-\d{2}$)", value):
+        #     raise InvalidCPFFormat("Invalid CPF")
 
         return value
 

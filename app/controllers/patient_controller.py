@@ -14,6 +14,7 @@ from app.services.tag_service import (
 )
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
+from flask_jwt_extended import jwt_required
 
 
 @jwt_required()
@@ -75,24 +76,24 @@ def create_patient() -> dict:
         svc_create_alert_tag(alerts, patient, session)
         session.commit()
 
-    except:
-        return {"error": "Error creating patient"}, HTTPStatus.BAD_REQUEST
 
-    return {
-        "_id": patient.patient_id,
-        "name": patient.name,
-        "gender": patient.gender,
-        "patient_code": patient.patient_code,
-        "profession": patient.profession,
-        "marital_status": patient.marital_status,
-        "responsible_guardian": patient.responsible_guardian,
-        "responsible_contact": patient.responsible_contact,
-        "birth_date": patient.birth_date,
-        "workspace": WorkspaceSchema().dump(patient.workspace),
-        "address": AddressSchema().dump(patient.address),
-        "allergies": AllergySchema(many=True, only=["name"]).dump(patient.allergies),
-        "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags),
-    }, HTTPStatus.CREATED
+        return {
+            "_id": patient.patient_id,
+            "name": patient.name,
+            "gender": patient.gender,
+            "patient_code": patient.patient_code,
+            "profession": patient.profession,
+            "marital_status": patient.marital_status,
+            "responsible_guardian": patient.responsible_guardian,
+            "responsible_contact": patient.responsible_contact,
+            "birth_date": patient.birth_date,
+            "workspace": WorkspaceSchema().dump(patient.workspace),
+            "address": AddressSchema().dump(patient.address),
+            "allergies": AllergySchema(many=True, only=["name"]).dump(patient.allergies),
+            "tags": TagSchema(many=True, only=["tag", "alert_tag"]).dump(patient.tags),
+        }, HTTPStatus.CREATED
+    except KeyError:
+        return {"error": "Error creating patient"}, HTTPStatus.BAD_REQUEST
 
 
 def get_patients():

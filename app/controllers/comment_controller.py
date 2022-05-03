@@ -6,6 +6,7 @@ from app.models.patient_model import Patient
 from app.models.user_model import User
 from flask import current_app, request
 from marshmallow.exceptions import ValidationError
+from flask_jwt_extended import jwt_required
 
 
 @jwt_required()

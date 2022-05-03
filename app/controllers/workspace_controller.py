@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from ipdb import set_trace
 
 from app.models import User
 from app.models.address_model import AddressSchema
@@ -35,6 +36,14 @@ def create_workspace() -> dict:
     session: Session = current_app.db.session
     data = request.json
 
+    # Normalization
+    if "name" in data.keys():
+        data["name"] = data["name"].title()
+    if "local" in data.keys():
+        data["local"] = data["local"].casefold()
+    if "categories" in data.keys():
+        data["categories"] = [cat.upper() for cat in data["categories"]]        
+
     user = User.query.get(data["owner_id"])
     if not user:
         return {"error": "User-owner not Found"}, HTTPStatus.BAD_REQUEST
@@ -46,7 +55,7 @@ def create_workspace() -> dict:
         for category in categories:
             ct = Category.query.filter_by(category=category).first()
             list_categories.append(ct)
-
+        
         schema = WorkspaceSchema()
         schema.load(data)
 
@@ -57,19 +66,18 @@ def create_workspace() -> dict:
         workspace.users.append(user)
 
         workspace.categories.extend(list_categories)
-
         session.add(workspace)
         session.commit()
-    except:
-        raise HTTPStatus.BAD_REQUEST
 
-    return {
-        "name": workspace.name,
-        "owner_id": workspace.owner_id,
-        "workspace_id": workspace.workspace_id,
-        "local": workspace.local,
-        "categories": CategorySchema(many=True).dump(workspace.categories),
-    }, HTTPStatus.CREATED
+        return {
+            "name": workspace.name,
+            "owner_id": workspace.owner_id,
+            "workspace_id": workspace.workspace_id,
+            "local": workspace.local,
+            "categories": CategorySchema(many=True).dump(workspace.categories),
+        }, HTTPStatus.CREATED
+    except KeyError:
+        raise HTTPStatus.BAD_REQUEST
 
 
 def get_workspaces() -> dict:
