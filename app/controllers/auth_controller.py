@@ -3,7 +3,6 @@ from flask import request
 from sqlalchemy.orm import Session
 from app.configs.database import db
 from flask_jwt_extended import create_access_token
-
 from app.models.user_model import User, UserSchema
 
 
