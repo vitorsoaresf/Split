@@ -1,3 +1,4 @@
+import datetime
 from http import HTTPStatus
 from app.models import Address, AddressSchema
 from app.models.user_model import User, UserSchema
@@ -6,7 +7,7 @@ from app.services.address_service import svc_create_address, svc_update_address
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity
 
 
 def create_user() -> dict:
@@ -33,10 +34,7 @@ def create_user() -> dict:
 
     try:
         address = data.pop("address")
-        new_address = svc_create_address(address)
-        session.add(new_address)
-        session.commit()
-
+        new_address = svc_create_address(address, session)
         password = data.pop("password")
         password_hash = generate_password_hash(password)
         data["password_hash"] = password_hash
@@ -53,23 +51,24 @@ def create_user() -> dict:
 
         session.add(new_user)
         session.commit()
-    except:
+
+        return {
+            "_id": new_user.user_id,
+            "name": new_user.name,
+            "profession": new_user.profession,
+            "cpf": new_user.cpf,
+            "phone": new_user.phone,
+            "email": new_user.email,
+            "profession_code": new_user.profession_code,
+            "address": address,
+        }, HTTPStatus.CREATED
+
+    except KeyError:
         return {
             "msg": "Error creating user",
             "user": data,
-            "address": AddressSchema.dump(new_address),
+            "address": AddressSchema().dump(new_address),
         }, HTTPStatus.BAD_REQUEST
-
-    return {
-        "_id": new_user.user_id,
-        "name": new_user.name,
-        "profession": new_user.profession,
-        "cpf": new_user.cpf,
-        "phone": new_user.phone,
-        "email": new_user.email,
-        "profession_code": new_user.profession_code,
-        "address": address,
-    }, HTTPStatus.CREATED
 
 
 @jwt_required()
@@ -111,6 +110,7 @@ def get_users() -> dict:
     return jsonify(list_users), HTTPStatus.OK
 
 
+@jwt_required()
 def get_user_specific(id: int) -> dict:
     """Get a specific user.
 
@@ -150,6 +150,7 @@ def get_user_specific(id: int) -> dict:
     }, HTTPStatus.OK
 
 
+@jwt_required()
 def update_user(id: int) -> dict:
     """Update a specific user.
 
@@ -169,6 +170,14 @@ def update_user(id: int) -> dict:
     session: Session = current_app.db.session
     data = request.get_json()
 
+    # Normalization
+    if "name" in data.keys():
+        data["name"] = data["name"].title()
+    if "email" in data.keys():
+        data["email"] = data["email"].casefold()
+    if "profession" in data.keys():
+        data["profession"] = data["profession"].title()
+
     user = User.query.get(id)
 
     if not user:
@@ -177,7 +186,7 @@ def update_user(id: int) -> dict:
     if "address" in data.keys():
         new_address = data.pop("address")
         address_id = user.address_id
-        svc_update_address(address_id, new_address)
+        svc_update_address(address_id, new_address, session)
 
     try:
         for key, value in data.items():
@@ -189,12 +198,22 @@ def update_user(id: int) -> dict:
 
         session.commit()
 
+        return {
+                "_id": user.user_id,
+                "name": user.name,
+                "profession": user.profession,
+                "cpf": user.cpf,
+                "phone": user.phone,
+                "email": user.email,
+                "profession_code": user.profession_code,
+                "address": AddressSchema().dump(user.address),
+            }, HTTPStatus.OK
     except:
         return {"msg": "Error updating user"}, HTTPStatus.BAD_REQUEST
 
-    return UserSchema(exclude=["password_hash"]).dump(user), HTTPStatus.OK
 
 
+@jwt_required()
 def delete_user(id: int) -> str:
     """Delete a specific user.
 
@@ -210,7 +229,9 @@ def delete_user(id: int) -> str:
         HTTPStatus.NOT_FOUND: If the user was not found.
 
     """
+    # credentials_user = get_jwt_identity()
 
+    # print(">>>> ", credentials_user)
     session: Session = current_app.db.session
 
     user = User.query.get(id)
@@ -222,3 +243,30 @@ def delete_user(id: int) -> str:
     session.commit()
 
     return {"msg": f"User {user.name} deleted"}, HTTPStatus.OK
+
+
+def login():
+
+    data: dict = request.get_json()
+
+    session: Session = current_app.db.session
+
+    try:
+
+        user_email = data.pop("email")
+
+        user_password = data.pop("password")
+
+        user: User = session.query(User).filter_by(email=user_email).first()
+
+        if not user:
+            raise ValueError
+
+        if not user.verify_password(user_password):
+            raise ValueError
+
+        access_token = create_access_token(identity=UserSchema().dump(user), expires_delta=datetime.timedelta(days=366))
+        return {"access_token": access_token}, HTTPStatus.OK
+
+    except:
+        return {"error": "Unauthorized"}, HTTPStatus.UNAUTHORIZED
