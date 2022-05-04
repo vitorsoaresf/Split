@@ -10,7 +10,21 @@ SPLIT API for CAPSTONE Q3 Kenzie Academy Brasil - app by Os Coringas da boa vis√
 
 ### Request
 
-    {request example}
+    {
+        "name": name,
+        "profession_code": profession code,
+        "cpf": cpf number,
+        "phone": phone number,
+        "email": email@mail.com,
+        "profession": profession,
+        "password": password,
+        "address": {
+            "street": street,
+            "cep": cep number,
+            "number_house": number house,
+            "complement": complement
+        }
+    }
 
 ### Response CREATED
 
@@ -31,6 +45,29 @@ SPLIT API for CAPSTONE Q3 Kenzie Academy Brasil - app by Os Coringas da boa vis√
         "msg": "Error creating user",
         "user": data,
         "address": address
+    }
+
+## Create USER
+
+`POST /users/login`
+
+### Request
+
+    {
+        "email": email@mail.com,
+        "password": password
+    }
+
+### Response OK
+
+    {
+        "access_token": access_token
+    }
+
+### Response UNAUTHORIZED
+
+    {
+        "error": "Unauthorized"
     }
 
 ## Get USERS
@@ -140,7 +177,12 @@ Arg: user_id
 
 ### Request
 
-    {request example}
+    {
+        "owner_id": number,
+        "name": name,
+        "local": local,
+        "categories": [category 1 , category 2]
+    }
 
 ### Response CREATED
 
@@ -294,6 +336,12 @@ Arg: workspace_id
 
 Arg: workspace_id
 
+Request:
+
+    {
+        "user_id": 6
+    }
+
 ### Response OK
 
     {
@@ -344,7 +392,26 @@ Arg: workspace_id
 
 ### Request
 
-    {request example}
+    {
+        "name" : name,
+        "gender": gender,
+        "cpf" : cpf number,
+        "profession" : profession,
+        "marital_status" : marital status,
+        "responsible_guardian" : responsible guardian,
+        "responsible_contact" : responsible contact,
+        "birth_date" : birth date,
+        "workspace_id" : workspace id,
+            "address": {
+                "street": street,
+                "cep": cep number,
+                "number_house": house number,
+                "complement": complement,
+            },
+        "allergies": [allergy 1, allergy 2],
+            "tags": [tag 1, tag 2],
+            "alerts": [alert 1, alert 2]
+    }
 
 ### Response CREATED
 
@@ -495,7 +562,13 @@ Arg: patient_id
 
 ### Request
 
-    {request example}
+    {
+        "description": data_description,
+        "patient_id": patient_id,
+        "category_id": category_id,
+        "tags": [data_tags],
+        "alerts": [alert_data_tags]
+    }
 
 ### Response CREATED
 
@@ -610,4 +683,117 @@ Arg: data_id
 
     {
         "msg": "Data not Found"
+    }
+
+========== COMMENTS ==========
+
+## Create COMMENT
+
+`POST /comments`
+
+### Request
+
+    {
+        "patient_id": patient id,
+        "user_id": user id,
+        "category_id": category id,
+        "comment": comment
+    }
+
+### Response CREATED
+
+    {
+        "comment_id": comment id,
+        "comment": comment,
+        "date_time": date time,
+        "user_id": user id,
+        "patient_id": patient id,
+        "category_id": category id
+    }
+
+### Response BAD_REQUEST
+
+    {
+        "error": "User not Found"
+    }
+
+### Response BAD_REQUEST
+
+    {
+        "error": "Category not Found"
+    }
+
+### Response BAD_REQUEST
+
+    {
+        "error": "Patient not Found"
+    }
+
+### Response BAD_REQUEST
+
+    ValidationError
+
+    {
+        "msg": """Error creating comment,
+            give the give the appropriate keys""",
+        "appropriate_keys": {
+            "comment": "string",
+            "patient_id": "integer",
+            "user_id": "integer",
+            "category_id": "integer",
+            },
+    }
+
+## Update SPECIFIC COMMENT
+
+`PATCH /comments/<comment_id>`
+
+### Request
+
+Arg: comment_id
+Request:
+
+    {
+        "comment": "tESTE"
+    }
+
+### Response OK
+
+    {
+        "comment_id": comment id,
+        "comment": comment,
+        "date_time": date time,
+        "user_id": user id,
+        "patient_id": patient id,
+        "category_id": category id
+    }
+
+### Response BAD_REQUEST
+
+    ValidationError
+
+    {
+        "msg": """Error updating comment,
+            give the give the appropriate keys""",
+        "appropriate_keys": {"comment": "string"},
+    }
+
+## Delete COMMENT
+
+`DELETE /comments/<comment_id>`
+
+### Request
+
+Arg: data_id
+
+### Response OK
+
+    {
+        "msg": "Comment deleted"
+    }
+
+### Response NOT_FOUND
+
+    {
+        "error": "Comment not Found"
     }
