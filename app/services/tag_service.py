@@ -1,4 +1,3 @@
-from ipdb import set_trace
 from app.models.tag_model import Tag, TagSchema
 from app.models.patient_model import Patient, PatientSchema
 
