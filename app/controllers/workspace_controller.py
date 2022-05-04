@@ -12,7 +12,7 @@ from app.models.workspace_model import Workspace, WorkspaceSchema
 from app.services.exc import InvalidName
 from flask import current_app, jsonify, request
 from sqlalchemy.orm import Session
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 @jwt_required()
@@ -281,6 +281,7 @@ def add_user_to_workspace(workspace_id: int) -> dict:
 
     session: Session = current_app.db.session
     data = request.json
+    owner = get_jwt_identity()
 
     user = User.query.get(data["user_id"])
     if not user:
@@ -290,10 +291,14 @@ def add_user_to_workspace(workspace_id: int) -> dict:
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
 
+    if owner.user_id != workspace.owner_id:
+        return {"msg": "You are not the owner of this workspace"}, HTTPStatus.UNAUTHORIZED
+    
     workspace.users.append(user)
 
     session.commit()
-
+    # user.email, owner.email, workspace.name
+    
     return {
         "name": workspace.name,
         "owner_id": workspace.owner_id,
