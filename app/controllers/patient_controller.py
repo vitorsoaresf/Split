@@ -42,10 +42,10 @@ def create_patient() -> dict:
     tags = data.pop("tags", [])
     alerts = data.pop("alerts", [])
 
-    # Normalization
-    data["name"] = data["name"].title()
-    data["profession"] = data["profession"].title()
-    data["responsible_guardian"] = data["responsible_guardian"].title()
+    # # Normalization
+    # data["name"] = data["name"].title()
+    # data["profession"] = data["profession"].title()
+    # data["responsible_guardian"] = data["responsible_guardian"].title()
 
     workspace_id = data.pop("workspace_id")
     workspace = Workspace.query.get(workspace_id)
@@ -54,10 +54,10 @@ def create_patient() -> dict:
         return {"error": "Workspace not found"}
 
     try:
-        patient_address = data.pop("address", {})
-        address = svc_create_address(patient_address, session)
+        # patient_address = data.pop("address", {})
+        # address = svc_create_address(patient_address, session)
 
-        data["address_id"] = address.address_id
+        # data["address_id"] = address.address_id
 
         allergies = data.pop("allergies", [])
         list_allergies = svc_create_allergy(allergies, session)
