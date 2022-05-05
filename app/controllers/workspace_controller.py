@@ -1,7 +1,4 @@
 from http import HTTPStatus
-from ipdb import set_trace
-from sqlalchemy import null
-
 from app.models import User
 from app.models.address_model import AddressSchema
 from app.models.allergy_model import AllergySchema
@@ -42,8 +39,7 @@ def create_workspace() -> dict:
         data["name"] = data["name"].title()
     if "local" in data.keys():
         data["local"] = data["local"].casefold()
-    if "categories" in data.keys():
-        data["categories"] = [cat.upper() for cat in data["categories"]]        
+    
 
     user = User.query.get(data["owner_id"])
     if not user:
@@ -171,6 +167,7 @@ def get_specific_workspace(id: int) -> dict:
                         "description": data.description,
                         "date": data.date,
                         "status": data.status,
+                        "patient_id": data.patient_id,
                         "category_id": data.category_id,
                         "category_name": data.category.category,
                         "tags": TagSchema(
@@ -183,6 +180,9 @@ def get_specific_workspace(id: int) -> dict:
                     {
                         "comment_id": comment.comment_id,
                         "comment": comment.comment,
+                        "patient_id": comment.patient_id,
+                        "user_id": comment.user_id,
+                        "category_id": comment.category_id,
                         "user_name": comment.user.name,
                         "date_time": comment.date_time,
                         "category_name": comment.category.category,
@@ -288,7 +288,7 @@ def add_user_to_workspace(workspace_id: int) -> dict:
     session: Session = current_app.db.session
     data = request.json
 
-    user = User.query.get(data["user_id"])
+    user = session.query(User).filter_by(email = data("email")).first()
     if not user:
         return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
 

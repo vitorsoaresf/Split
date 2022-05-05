@@ -6,7 +6,6 @@ def svc_create_tag(tags, patient, session):
 
         obj = {
             "tag": tag.casefold(),
-            "patient_id": patient.patient_id,
             "alert_tag": False,
         }
         new_tag = Tag(**obj)
@@ -17,7 +16,6 @@ def svc_create_alert_tag(alerts, patient, session):
     for alert in alerts:
             obj = {
                 "tag": alert.casefold(),
-                "patient_id": patient.patient_id,
                 "alert_tag": True,
             }
             new_tag = Tag(**obj)

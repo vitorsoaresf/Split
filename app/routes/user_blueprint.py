@@ -9,3 +9,5 @@ bp.get("/<int:id>")(user_controller.get_user_specific)
 bp.delete("/<int:id>")(user_controller.delete_user)
 bp.patch("/<int:id>")(user_controller.update_user)
 bp.post("/login")(user_controller.login)
+
+
