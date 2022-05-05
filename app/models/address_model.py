@@ -1,6 +1,8 @@
 from app.configs.database import db
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, validates
 from sqlalchemy import Column, Integer, String
+from app.services.exc import InvalidCEP
+import re
 
 
 class Address(db.Model):
@@ -50,3 +52,19 @@ class AddressSchema(Schema):
     cep = fields.String()
     number_house = fields.String()
     complement = fields.String()
+
+
+    @validates("cep")
+    def validate_cep(self, value):
+        """Validates CEP.
+
+        This method validates the CEP code.
+
+        Args:
+            value: A string value with CEP code.
+
+        Raises:
+            InvalidCEP: If the CEP code is invalid.
+        """
+        if not re.match(r"(^[0-9]{5})-?([0-9]{3}$)", value):
+            raise InvalidCEP("CEP is not valid.")

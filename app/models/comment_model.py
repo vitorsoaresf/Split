@@ -32,6 +32,10 @@ class Comment(db.Model):
         "Patient", back_populates="comments", uselist=False
     )
 
+    user = db.relationship("User", back_populates="comments", uselist=False)
+
+    category = db.relationship("Category", back_populates="comments", uselist=False)
+
 
 class CommentSchema(Schema):
     """Comment model schema.
