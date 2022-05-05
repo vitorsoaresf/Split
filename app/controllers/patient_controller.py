@@ -74,6 +74,9 @@ def create_patient() -> dict:
 
         svc_create_tag(tags, patient, session)
         svc_create_alert_tag(alerts, patient, session)
+
+        patient.internation = True
+
         session.commit()
 
 
@@ -187,6 +190,9 @@ def update_patient(id: int):
         svc_update_delete_tag(tags, alerts, patient, session)
         allergies = data.pop("allergies", [])
         svc_update_allergy(patient, allergies, session)
+
+        if "workspace_id" in data.keys():
+            patient.internation = True
 
         for key, value in data.items():
             setattr(patient, key, value)

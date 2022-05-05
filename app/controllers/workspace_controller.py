@@ -1,6 +1,4 @@
-import email
 from http import HTTPStatus
-
 from app.models import User
 from app.models.address_model import AddressSchema
 from app.models.allergy_model import AllergySchema
@@ -254,10 +252,15 @@ def delete_workspace(workspace_id: int) -> dict:
     session: Session = current_app.db.session
 
     workspace = Workspace.query.get(workspace_id)
-
+    
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
 
+    for patient in workspace.patients:
+        patient.internation = False
+    
+    
+    workspace.patients = []
     session.delete(workspace)
     session.commit()
 
