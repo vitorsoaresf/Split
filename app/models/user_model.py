@@ -139,11 +139,11 @@ class UserSchema(Schema):
 
         """
 
-        if not value.isdigit() or len(value) != 11:
-            raise InvalidPhone("Invalid Phone")
+        # if not value.isdigit() or len(value) != 11:
+        #     raise InvalidPhone("Invalid Phone")
 
-        if not re.match(r"(^[0-9]{2})?(\s|-)?(9?[0-9]{4})-?([0-9]{4}$)", value):
-            raise InvalidPhoneFormat("Invalid Phone format")
+        # if not re.match(r"(^[0-9]{2})?(\s|-)?(9?[0-9]{4})-?([0-9]{4}$)", value):
+        #     raise InvalidPhoneFormat("Invalid Phone format")
 
         return value
 
