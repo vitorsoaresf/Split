@@ -1,5 +1,6 @@
 from http import HTTPStatus
 from ipdb import set_trace
+from sqlalchemy import null
 
 from app.models import User
 from app.models.address_model import AddressSchema
@@ -251,10 +252,15 @@ def delete_workspace(workspace_id: int) -> dict:
     session: Session = current_app.db.session
 
     workspace = Workspace.query.get(workspace_id)
-
+    
     if not workspace:
         return {"msg": "Workspace not Found"}, HTTPStatus.NOT_FOUND
 
+    for patient in workspace.patients:
+        patient.internation = False
+    
+    
+    workspace.patients = []
     session.delete(workspace)
     session.commit()
 
