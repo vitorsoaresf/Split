@@ -182,9 +182,9 @@ def update_patient(id: int):
         return {"msg": "Patient not Found"}, HTTPStatus.NOT_FOUND
 
     try:
-        address = data.pop("address", {})
-        address_id = patient.address_id
-        svc_update_address(address_id, address, session)
+        # address = data.pop("address", {})
+        # address_id = patient.address_id
+        # svc_update_address(address_id, address, session)
         tags = data.pop("tags", [])
         alerts = data.pop("alert", [])
         svc_update_delete_tag(tags, alerts, patient, session)

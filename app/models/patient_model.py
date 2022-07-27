@@ -107,6 +107,7 @@ class PatientSchema(Schema):
     responsible_guardian = fields.String()
     responsible_contact = fields.String()
     birth_date = fields.String()
+    internation = fields.Boolean()
     allergies = fields.List(fields.String())
     address_id = fields.Integer()
     workspace_id = fields.Integer()

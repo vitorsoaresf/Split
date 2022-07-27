@@ -288,7 +288,7 @@ def add_user_to_workspace(workspace_id: int) -> dict:
     session: Session = current_app.db.session
     data = request.json
 
-    user = session.query(User).filter_by(email = data("email")).first()
+    user = session.query(User).filter_by(email = data["email"]).first()
     if not user:
         return {"msg": "User not Found"}, HTTPStatus.NOT_FOUND
 
